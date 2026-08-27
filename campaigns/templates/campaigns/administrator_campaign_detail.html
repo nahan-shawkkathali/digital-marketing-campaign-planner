@@ -1,0 +1,31 @@
+{% extends 'campaigns/base.html' %}
+{% block title %}{{ campaign.name }} | Campaign Planner{% endblock %}
+{% block content %}
+<main class="py-5">
+    <div class="container">
+        <a class="btn btn-link px-0 mb-3" href="{% url 'administrator_dashboard' %}">&larr; Back to dashboard</a>
+        {% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm"><div class="card-body p-4 p-lg-5">
+                    <div class="d-flex flex-wrap justify-content-between gap-3 mb-4"><div><p class="text-secondary mb-1">Campaign request</p><h1 class="h2 fw-bold mb-0">{{ campaign.name }}</h1></div><span class="badge text-bg-primary align-self-start fs-6">{{ campaign.get_status_display }}</span></div>
+                    <h2 class="h6 text-uppercase text-secondary">Description</h2><p class="mb-4">{{ campaign.description|linebreaksbr }}</p>
+                    <div class="row g-4">
+                        <div class="col-md-6"><h2 class="h6 text-uppercase text-secondary">Client</h2><p class="mb-0">{{ campaign.client.get_full_name|default:campaign.client.username }}</p><p class="text-secondary">{{ campaign.client.email|default:"No email provided" }}</p></div>
+                        <div class="col-md-6"><h2 class="h6 text-uppercase text-secondary">Target audience</h2><p>{{ campaign.target_audience|default:"Not specified" }}</p></div>
+                        <div class="col-md-4"><h2 class="h6 text-uppercase text-secondary">Budget</h2><p>{{ campaign.budget|default:"Not specified" }}</p></div>
+                        <div class="col-md-4"><h2 class="h6 text-uppercase text-secondary">Start date</h2><p>{{ campaign.start_date|date:"M j, Y"|default:"Not specified" }}</p></div>
+                        <div class="col-md-4"><h2 class="h6 text-uppercase text-secondary">End date</h2><p>{{ campaign.end_date|date:"M j, Y"|default:"Not specified" }}</p></div>
+                    </div>
+                    <hr><small class="text-secondary">Submitted {{ campaign.created_at|date:"M j, Y, P" }}</small>
+                </div></div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4"><div class="card-body p-4"><h2 class="h5 fw-bold mb-3">Assigned employee</h2><p class="text-secondary small">Only approved campaigns can be assigned.</p><form method="post">{% csrf_token %}{{ assignment_form.assigned_employee }}{% for error in assignment_form.assigned_employee.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}<button class="btn btn-primary w-100 mt-3" name="update_assignment" type="submit">Update assignment</button></form></div></div>
+                <div class="card border-0 shadow-sm mb-4"><div class="card-body p-4"><h2 class="h5 fw-bold mb-3">Change status</h2><form method="post">{% csrf_token %}{{ status_form.status }}{% for error in status_form.status.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}<button class="btn btn-primary w-100 mt-3" name="update_status" type="submit">Update status</button></form></div></div>
+                {% if campaign.status == 'pending' %}<div class="card border-0 shadow-sm"><div class="card-body p-4"><h2 class="h5 fw-bold mb-3">Decision</h2><div class="d-grid gap-2"><form method="post" action="{% url 'administrator_campaign_decision' campaign.id 'approve' %}">{% csrf_token %}<button class="btn btn-success w-100" type="submit">Approve request</button></form><form method="post" action="{% url 'administrator_campaign_decision' campaign.id 'reject' %}">{% csrf_token %}<button class="btn btn-outline-danger w-100" type="submit">Reject request</button></form></div></div></div>{% endif %}
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

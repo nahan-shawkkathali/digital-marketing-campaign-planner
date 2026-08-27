@@ -1,0 +1,92 @@
+:root {
+    --brand-dark: #102a43;
+    --brand-primary: #2563eb;
+    --brand-accent: #22c55e;
+    --page-background: #f4f7fb;
+}
+
+body {
+    background: var(--page-background);
+    color: var(--brand-dark);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.navbar {
+    background: var(--brand-dark);
+}
+
+.hero-section {
+    background:
+        radial-gradient(circle at 15% 20%, rgba(34, 197, 94, 0.25), transparent 30%),
+        linear-gradient(135deg, #102a43 0%, #174ea6 100%);
+}
+
+.min-vh-50 {
+    min-height: 50vh;
+}
+
+.hero-section .badge {
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    padding: 0.65rem 1rem;
+}
+
+.hero-section .lead {
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.role-card {
+    border-radius: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.role-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 1rem 2rem rgba(16, 42, 67, 0.12) !important;
+}
+
+.role-icon {
+    align-items: center;
+    background: #e8f0ff;
+    border-radius: 1rem;
+    color: var(--brand-primary);
+    display: flex;
+    font-size: 1.5rem;
+    font-weight: 700;
+    height: 4rem;
+    justify-content: center;
+    width: 4rem;
+}
+
+.btn-primary {
+    background: var(--brand-primary);
+    border-color: var(--brand-primary);
+    border-radius: 0.65rem;
+    font-weight: 600;
+    padding: 0.7rem 1rem;
+}
+
+footer {
+    background: #ffffff;
+    border-top: 1px solid #e5eaf0;
+}
+
+.auth-section { min-height: calc(100vh - 145px); }
+.auth-card, .dashboard-card { border-radius: 1rem; }
+.auth-card .form-control { border-radius: 0.65rem; padding: 0.7rem 0.85rem; }
+.auth-card .form-control:focus { border-color: var(--brand-primary); box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15); }
+.auth-card .form-text ul { margin-bottom: 0; padding-left: 1.2rem; }
+.dashboard-header {
+    background: radial-gradient(circle at 85% 15%, rgba(34, 197, 94, 0.25), transparent 30%), linear-gradient(135deg, #102a43 0%, #174ea6 100%);
+}
+.dashboard-header .badge { background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.25); }
+.dashboard-header .lead { color: rgba(255, 255, 255, 0.82); }
+.dashboard-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.dashboard-card:hover { transform: translateY(-4px); box-shadow: 0 1rem 2rem rgba(16, 42, 67, 0.12) !important; }
+.feature-icon {
+    align-items: center; background: #e8f0ff; border-radius: 0.75rem; color: var(--brand-primary); display: flex;
+    font-size: 1.15rem; font-weight: 700; height: 2.75rem; justify-content: center; width: 2.75rem;
+}
