@@ -21,9 +21,12 @@
                             <li class="nav-item"><a class="nav-link" href="{% url 'administrator_dashboard' %}">Administrator Dashboard</a></li>
                         {% elif user.employee_profile %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'employee_dashboard' %}">Employee Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'employee_dashboard' %}#assigned-campaigns">Assigned Campaigns</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'employee_task_list' %}">My Tasks</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'employee_profile' %}">Profile</a></li>
                         {% else %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'client_dashboard' %}">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'client_profile' %}">Profile</a></li>
                         {% endif %}
                         <li class="nav-item"><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="btn btn-outline-light btn-sm" type="submit">Log out</button></form></li>
                     {% else %}

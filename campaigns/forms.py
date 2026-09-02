@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 
-from .models import Campaign, EmployeeProfile
+from .models import Campaign, Deliverable, EmployeeProfile, Task
 
 
 class BootstrapFormMixin:
@@ -35,6 +35,24 @@ class ClientLoginForm(BootstrapFormMixin, AuthenticationForm):
         self.apply_bootstrap_styles()
 
 
+class ClientProfileForm(BootstrapFormMixin, forms.ModelForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ("first_name", "last_name", "email")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_bootstrap_styles()
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip().lower()
+        if User.objects.filter(email__iexact=email).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("An account with this email already exists.")
+        return email
+
+
 class AdministratorLoginForm(ClientLoginForm):
     def confirm_login_allowed(self, user):
         super().confirm_login_allowed(user)
@@ -50,6 +68,37 @@ class CampaignStatusForm(forms.ModelForm):
         model = Campaign
         fields = ("status",)
         widgets = {"status": forms.Select(attrs={"class": "form-select"})}
+
+
+class CampaignRequestForm(BootstrapFormMixin, forms.ModelForm):
+    class Meta:
+        model = Campaign
+        fields = (
+            "name",
+            "description",
+            "campaign_type",
+            "target_audience",
+            "budget",
+            "start_date",
+            "end_date",
+        )
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 5}),
+            "start_date": forms.DateInput(attrs={"type": "date"}),
+            "end_date": forms.DateInput(attrs={"type": "date"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_bootstrap_styles()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get("start_date")
+        end_date = cleaned_data.get("end_date")
+        if start_date and end_date and end_date < start_date:
+            self.add_error("end_date", "End date cannot be before the start date.")
+        return cleaned_data
 
 
 class EmployeeLoginForm(ClientLoginForm):
@@ -158,6 +207,12 @@ class CampaignAssignmentForm(forms.ModelForm):
         fields = ("assigned_employee",)
         widgets = {"assigned_employee": forms.Select(attrs={"class": "form-select"})}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["assigned_employee"].queryset = EmployeeProfile.objects.filter(
+            user__is_active=True,
+        ).select_related("user").order_by("user__first_name", "user__username")
+
     def clean_assigned_employee(self):
         employee = self.cleaned_data["assigned_employee"]
         if employee and self.instance.status != Campaign.Status.APPROVED:
@@ -186,3 +241,46 @@ class EmployeeCampaignProgressForm(forms.ModelForm):
         if cleaned_data.get("status") == Campaign.Status.COMPLETED:
             cleaned_data["progress_percentage"] = 100
         return cleaned_data
+
+
+class DeliverableUploadForm(BootstrapFormMixin, forms.ModelForm):
+    class Meta:
+        model = Deliverable
+        fields = ("title", "description", "uploaded_file")
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 4}),
+            "uploaded_file": forms.ClearableFileInput(
+                attrs={"accept": ".pdf,.docx,.jpg,.jpeg,.png"},
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_bootstrap_styles()
+
+
+class AdministratorTaskForm(BootstrapFormMixin, forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ("title", "description", "due_date", "assigned_employee")
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 4}),
+            "due_date": forms.DateInput(attrs={"type": "date"}),
+        }
+
+    def __init__(self, *args, campaign, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.campaign = campaign
+        employees = EmployeeProfile.objects.filter(user__is_active=True)
+        if campaign.assigned_employee_id:
+            employees = employees.filter(pk=campaign.assigned_employee_id)
+        self.fields["assigned_employee"].queryset = employees.select_related("user")
+        self.fields["assigned_employee"].required = True
+        self.apply_bootstrap_styles()
+
+
+class EmployeeTaskStatusForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ("status",)
+        widgets = {"status": forms.Select(attrs={"class": "form-select"})}

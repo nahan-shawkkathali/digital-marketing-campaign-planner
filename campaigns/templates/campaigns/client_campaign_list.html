@@ -1,0 +1,27 @@
+{% extends 'campaigns/base.html' %}
+{% block title %}My Campaigns | Campaign Planner{% endblock %}
+{% block content %}
+<main class="py-5">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div><a class="btn btn-link px-0" href="{% url 'client_dashboard' %}">&larr; Back to dashboard</a><h1 class="h2 fw-bold mb-0">My Campaigns</h1></div>
+            <a class="btn btn-primary" href="{% url 'campaign_request' %}">Request Campaign</a>
+        </div>
+        {% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light"><tr><th>Campaign</th><th>Submitted</th><th>Deadline</th><th>Status</th><th>Progress</th><th class="text-end">Action</th></tr></thead>
+                    <tbody>
+                        {% for campaign in campaigns %}
+                            <tr><td class="fw-semibold"><a href="{% url 'client_campaign_detail' campaign.id %}">{{ campaign.name }}</a></td><td>{{ campaign.created_at|date:"M j, Y" }}</td><td>{{ campaign.end_date|date:"M j, Y"|default:"Not specified" }}</td><td><span class="badge text-bg-primary">{{ campaign.get_status_display }}</span></td><td>{{ campaign.progress_percentage }}%</td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'client_campaign_detail' campaign.id %}">View details</a></td></tr>
+                        {% empty %}
+                            <tr><td class="text-center text-secondary py-5" colspan="6">You have not submitted any campaign requests yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

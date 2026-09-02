@@ -1,19 +1,24 @@
 from django.contrib.auth import login
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from .forms import (
     AdministratorEmployeeForm,
+    AdministratorTaskForm,
     CampaignAssignmentForm,
+    CampaignRequestForm,
     CampaignStatusForm,
+    ClientProfileForm,
     ClientRegistrationForm,
     EmployeeCampaignProgressForm,
     EmployeeCreationForm,
     EmployeeProfileForm,
+    EmployeeTaskStatusForm,
+    DeliverableUploadForm,
 )
-from .models import Campaign, EmployeeProfile
+from .models import Campaign, Deliverable, EmployeeProfile, Task
 
 
 def staff_required(view_func):
@@ -29,12 +34,32 @@ def employee_required(view_func):
         login_url="employee_login",
     )(view_func)
 
+
+def is_client(user):
+    return (
+        user.is_authenticated
+        and not user.is_staff
+        and not user.is_superuser
+        and not hasattr(user, "employee_profile")
+    )
+
+
+def client_required(view_func):
+    return user_passes_test(
+        is_client,
+        login_url="login",
+    )(view_func)
+
 def home(request):
     return render(request, 'campaigns/home.html')
 
 
 def register(request):
     if request.user.is_authenticated:
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect("administrator_dashboard")
+        if hasattr(request.user, "employee_profile"):
+            return redirect("employee_dashboard")
         return redirect("client_dashboard")
     form = ClientRegistrationForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
@@ -44,9 +69,80 @@ def register(request):
     return render(request, "campaigns/register.html", {"form": form})
 
 
-@login_required(login_url="login")
+@client_required
 def client_dashboard(request):
     return render(request, "campaigns/client_dashboard.html")
+
+
+@client_required
+def client_profile(request):
+    form = ClientProfileForm(request.POST or None, instance=request.user)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Your profile was updated.")
+        return redirect("client_profile")
+    return render(request, "campaigns/client_profile.html", {"form": form})
+
+
+@client_required
+def campaign_request(request):
+    form = CampaignRequestForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        campaign = form.save(commit=False)
+        campaign.client = request.user
+        campaign.status = Campaign.Status.PENDING
+        campaign.save()
+        messages.success(request, f'Campaign request "{campaign.name}" submitted successfully.')
+        return redirect("client_campaign_list")
+    return render(request, "campaigns/campaign_request.html", {"form": form})
+
+
+@client_required
+def client_campaign_list(request):
+    campaigns = Campaign.objects.filter(client=request.user)
+    return render(request, "campaigns/client_campaign_list.html", {"campaigns": campaigns})
+
+
+@client_required
+def client_campaign_detail(request, campaign_id):
+    campaign = get_object_or_404(
+        Campaign.objects.select_related("assigned_employee__user"),
+        pk=campaign_id,
+        client=request.user,
+    )
+    deliverables = campaign.deliverables.select_related("uploaded_by__user")
+    total_tasks = campaign.tasks.count()
+    completed_tasks = campaign.tasks.filter(status=Task.Status.COMPLETED).count()
+    return render(request, "campaigns/client_campaign_detail.html", {
+        "campaign": campaign,
+        "deliverables": deliverables,
+        "total_tasks": total_tasks,
+        "completed_tasks": completed_tasks,
+    })
+
+
+@client_required
+@require_POST
+def client_deliverable_decision(request, campaign_id, deliverable_id, decision):
+    deliverable = get_object_or_404(
+        Deliverable.objects.select_related("campaign"),
+        pk=deliverable_id,
+        campaign_id=campaign_id,
+        campaign__client=request.user,
+    )
+    decisions = {
+        "approve": Deliverable.ApprovalStatus.APPROVED,
+        "reject": Deliverable.ApprovalStatus.REJECTED,
+    }
+    if decision not in decisions:
+        messages.error(request, "Invalid deliverable decision.")
+    elif deliverable.approval_status != Deliverable.ApprovalStatus.PENDING:
+        messages.error(request, "This deliverable has already been reviewed.")
+    else:
+        deliverable.approval_status = decisions[decision]
+        deliverable.save(update_fields=("approval_status",))
+        messages.success(request, f'Deliverable "{deliverable.title}" was {decision}d.')
+    return redirect("client_campaign_detail", campaign_id=campaign_id)
 
 
 @staff_required
@@ -79,6 +175,28 @@ def administrator_campaign_detail(request, campaign_id):
         "campaign": campaign,
         "status_form": status_form,
         "assignment_form": assignment_form,
+        "tasks": campaign.tasks.select_related("assigned_employee__user"),
+    })
+
+
+@staff_required
+def administrator_task_create(request, campaign_id):
+    campaign = get_object_or_404(
+        Campaign,
+        pk=campaign_id,
+        status=Campaign.Status.APPROVED,
+    )
+    form = AdministratorTaskForm(request.POST or None, campaign=campaign)
+    if request.method == "POST" and form.is_valid():
+        task = form.save(commit=False)
+        task.campaign = campaign
+        task.status = Task.Status.PENDING
+        task.save()
+        messages.success(request, f'Task "{task.title}" created.')
+        return redirect("administrator_campaign_detail", campaign_id=campaign.pk)
+    return render(request, "campaigns/administrator_task_form.html", {
+        "campaign": campaign,
+        "form": form,
     })
 
 
@@ -133,6 +251,44 @@ def employee_dashboard(request):
 
 
 @employee_required
+def employee_task_list(request):
+    tasks = Task.objects.filter(
+        assigned_employee=request.user.employee_profile,
+    ).select_related("campaign")
+    return render(request, "campaigns/employee_task_list.html", {"tasks": tasks})
+
+
+@employee_required
+def employee_task_detail(request, task_id):
+    task = get_object_or_404(
+        Task.objects.select_related("campaign", "assigned_employee__user"),
+        pk=task_id,
+        assigned_employee=request.user.employee_profile,
+    )
+    return render(request, "campaigns/employee_task_detail.html", {
+        "task": task,
+        "status_form": EmployeeTaskStatusForm(instance=task),
+    })
+
+
+@employee_required
+@require_POST
+def employee_task_status_update(request, task_id):
+    task = get_object_or_404(
+        Task,
+        pk=task_id,
+        assigned_employee=request.user.employee_profile,
+    )
+    form = EmployeeTaskStatusForm(request.POST, instance=task)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Task status updated.")
+    else:
+        messages.error(request, "Please select a valid task status.")
+    return redirect("employee_task_detail", task_id=task.pk)
+
+
+@employee_required
 def employee_campaign_detail(request, campaign_id):
     campaign = get_object_or_404(
         Campaign.objects.select_related("client"),
@@ -144,7 +300,32 @@ def employee_campaign_detail(request, campaign_id):
         form.save()
         messages.success(request, "Campaign progress updated.")
         return redirect("employee_campaign_detail", campaign_id=campaign.pk)
-    return render(request, "campaigns/employee_campaign_detail.html", {"campaign": campaign, "progress_form": form})
+    return render(request, "campaigns/employee_campaign_detail.html", {
+        "campaign": campaign,
+        "deliverables": campaign.deliverables.select_related("uploaded_by__user"),
+        "progress_form": form,
+    })
+
+
+@employee_required
+def employee_deliverable_upload(request, campaign_id):
+    campaign = get_object_or_404(
+        Campaign,
+        pk=campaign_id,
+        assigned_employee=request.user.employee_profile,
+    )
+    form = DeliverableUploadForm(request.POST or None, request.FILES or None)
+    if request.method == "POST" and form.is_valid():
+        deliverable = form.save(commit=False)
+        deliverable.campaign = campaign
+        deliverable.uploaded_by = request.user.employee_profile
+        deliverable.save()
+        messages.success(request, f'Deliverable "{deliverable.title}" uploaded successfully.')
+        return redirect("employee_campaign_detail", campaign_id=campaign.pk)
+    return render(request, "campaigns/employee_deliverable_upload.html", {
+        "campaign": campaign,
+        "form": form,
+    })
 
 
 @employee_required
