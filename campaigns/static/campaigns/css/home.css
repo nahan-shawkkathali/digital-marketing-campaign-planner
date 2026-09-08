@@ -85,6 +85,9 @@ footer {
 .dashboard-header .badge { background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.25); }
 .dashboard-header .lead { color: rgba(255, 255, 255, 0.82); }
 .dashboard-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.dashboard-card .card-body { display: flex; flex-direction: column; align-items: flex-start; }
+.dashboard-card .card-body > .btn { margin-top: auto; }
+.dashboard-card .feature-icon { flex-shrink: 0; }
 .dashboard-card:hover { transform: translateY(-4px); box-shadow: 0 1rem 2rem rgba(16, 42, 67, 0.12) !important; }
 .feature-icon {
     align-items: center; background: #e8f0ff; border-radius: 0.75rem; color: var(--brand-primary); display: flex;

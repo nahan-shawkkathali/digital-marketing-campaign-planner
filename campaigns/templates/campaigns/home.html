@@ -28,7 +28,7 @@
                                 <div class="role-icon mx-auto mb-4">C</div>
                                 <h3 class="h4 fw-bold">Client</h3>
                                 <p class="text-secondary">Review campaign plans, goals, and progress from one convenient place.</p>
-                                {% if user.is_authenticated %}
+                                {% if user.is_authenticated and not user.is_staff and not user.is_superuser and not user.employee_profile %}
                                     <a class="btn btn-primary w-100" href="{% url 'client_dashboard' %}">Open Client Dashboard</a>
                                 {% else %}
                                     <a class="btn btn-primary w-100 mb-2" href="{% url 'login' %}">Client Login</a>
@@ -43,7 +43,11 @@
                                 <div class="role-icon mx-auto mb-4">M</div>
                                 <h3 class="h4 fw-bold">Marketing Employee</h3>
                                 <p class="text-secondary">Plan campaign activities and keep marketing work organized.</p>
-                                <a class="btn btn-primary w-100" href="{% url 'employee_dashboard' %}">Employee Login</a>
+                                {% if user.is_authenticated and user.employee_profile %}
+                                    <a class="btn btn-primary w-100" href="{% url 'employee_dashboard' %}">Open Employee Dashboard</a>
+                                {% else %}
+                                    <a class="btn btn-primary w-100" href="{% url 'employee_login' %}">Employee Login</a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -53,7 +57,11 @@
                                 <div class="role-icon mx-auto mb-4">A</div>
                                 <h3 class="h4 fw-bold">Administrator</h3>
                                 <p class="text-secondary">Oversee users, campaigns, and the overall planning system.</p>
-                                <a class="btn btn-primary w-100" href="{% url 'administrator_dashboard' %}">Administrator Login</a>
+                                {% if user.is_staff or user.is_superuser %}
+                                    <a class="btn btn-primary w-100" href="{% url 'administrator_dashboard' %}">Open Administrator Dashboard</a>
+                                {% else %}
+                                    <a class="btn btn-primary w-100" href="{% url 'administrator_login' %}">Administrator Login</a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

@@ -9,19 +9,21 @@
         <div class="container">
             {% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>{% endfor %}
             <div class="row g-4 mb-5">
-                <div class="col-sm-6 col-xl-3"><div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-secondary mb-2">Total Campaigns</p><p class="display-6 fw-bold mb-0">{{ total_campaigns }}</p></div></div></div>
-                <div class="col-sm-6 col-xl-3"><div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-secondary mb-2">Pending Campaigns</p><p class="display-6 fw-bold text-warning mb-0">{{ pending_campaigns }}</p></div></div></div>
-                <div class="col-sm-6 col-xl-3"><div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-secondary mb-2">Approved Campaigns</p><p class="display-6 fw-bold text-success mb-0">{{ approved_campaigns }}</p></div></div></div>
-                <div class="col-sm-6 col-xl-3"><div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-secondary mb-2">Completed Campaigns</p><p class="display-6 fw-bold text-primary mb-0">{{ completed_campaigns }}</p></div></div></div>
+                <div class="col-sm-6 col-lg-4 col-xl-2"><div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-secondary mb-2">Total Campaigns</p><p class="display-6 fw-bold mb-0">{{ total_campaigns }}</p></div></div></div>
+                <div class="col-sm-6 col-lg-4 col-xl-2"><div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-secondary mb-2">Pending Campaigns</p><p class="display-6 fw-bold text-warning mb-0">{{ pending_campaigns }}</p></div></div></div>
+                <div class="col-sm-6 col-lg-4 col-xl-2"><div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-secondary mb-2">Approved Campaigns</p><p class="display-6 fw-bold text-success mb-0">{{ approved_campaigns }}</p></div></div></div>
+                <div class="col-sm-6 col-lg-4 col-xl-2"><div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-secondary mb-2">Completed Campaigns</p><p class="display-6 fw-bold text-primary mb-0">{{ completed_campaigns }}</p></div></div></div>
+                <div class="col-sm-6 col-lg-4 col-xl-2"><div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-secondary mb-2">In Progress Campaigns</p><p class="display-6 fw-bold text-info mb-0">{{ in_progress_campaigns }}</p></div></div></div>
+                <div class="col-sm-6 col-lg-4 col-xl-2"><div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-secondary mb-2">Rejected Campaigns</p><p class="display-6 fw-bold text-danger mb-0">{{ rejected_campaigns }}</p></div></div></div>
             </div>
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm" id="campaigns">
                 <div class="card-header bg-white py-3"><h2 class="h5 fw-bold mb-0">Submitted Campaign Requests</h2></div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light"><tr><th>Campaign</th><th>Client</th><th>Assigned employee</th><th>Progress</th><th>Status</th><th class="text-end">Action</th></tr></thead>
                         <tbody>
                             {% for campaign in campaigns %}
-                                <tr><td class="fw-semibold">{{ campaign.name }}</td><td>{{ campaign.client.get_full_name|default:campaign.client.username }}<br><small class="text-secondary">{{ campaign.client.email }}</small></td><td>{{ campaign.assigned_employee|default:"Unassigned" }}</td><td>{{ campaign.progress_percentage }}%</td><td><span class="badge {% if campaign.status == 'approved' or campaign.status == 'completed' %}text-bg-success{% elif campaign.status == 'rejected' %}text-bg-danger{% elif campaign.status == 'pending' %}text-bg-warning{% else %}text-bg-primary{% endif %}">{{ campaign.get_status_display }}</span></td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'administrator_campaign_detail' campaign.id %}">View details</a></td></tr>
+                                <tr><td class="fw-semibold">{{ campaign.name }}</td><td>{{ campaign.client.get_full_name|default:campaign.client.username }}<br><small class="text-secondary">{{ campaign.client.email }}</small></td><td>{{ campaign.assigned_employee|default:"Unassigned" }}</td><td>{{ campaign.progress_percentage }}%</td><td>{% include 'campaigns/includes/status_badge.html' with status=campaign.status label=campaign.get_status_display extra_classes="align-self-start" only %}</td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'administrator_campaign_detail' campaign.id %}">View details</a></td></tr>
                             {% empty %}
                                 <tr><td class="text-center text-secondary py-5" colspan="6">No campaign requests have been submitted yet.</td></tr>
                             {% endfor %}

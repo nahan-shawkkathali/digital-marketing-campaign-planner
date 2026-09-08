@@ -1,0 +1,1 @@
+<span class="badge {% if status == 'completed' %}text-bg-success{% elif status == 'approved' %}text-bg-primary{% elif status == 'in_progress' %}text-bg-info{% elif status == 'rejected' %}text-bg-danger{% elif status == 'pending' %}text-bg-warning{% else %}text-bg-secondary{% endif %} {{ extra_classes }}">{{ label }}</span>

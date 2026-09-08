@@ -27,6 +27,7 @@ urlpatterns = [
     path('client/campaigns/request/', views.campaign_request, name='campaign_request'),
     path('client/campaigns/', views.client_campaign_list, name='client_campaign_list'),
     path('client/campaigns/<int:campaign_id>/', views.client_campaign_detail, name='client_campaign_detail'),
+    path('client/campaigns/<int:campaign_id>/report/', views.client_campaign_report, name='client_campaign_report'),
     path(
         'client/campaigns/<int:campaign_id>/deliverables/<int:deliverable_id>/<str:decision>/',
         views.client_deliverable_decision,
@@ -40,6 +41,7 @@ urlpatterns = [
     ), name='administrator_login'),
     path('administrator/dashboard/', views.administrator_dashboard, name='administrator_dashboard'),
     path('administrator/campaigns/<int:campaign_id>/', views.administrator_campaign_detail, name='administrator_campaign_detail'),
+    path('administrator/campaigns/<int:campaign_id>/report/', views.administrator_campaign_report, name='administrator_campaign_report'),
     path('administrator/campaigns/<int:campaign_id>/tasks/create/', views.administrator_task_create, name='administrator_task_create'),
     path('administrator/campaigns/<int:campaign_id>/<str:decision>/', views.administrator_campaign_decision, name='administrator_campaign_decision'),
     path('administrator/employees/', views.administrator_employee_list, name='administrator_employee_list'),

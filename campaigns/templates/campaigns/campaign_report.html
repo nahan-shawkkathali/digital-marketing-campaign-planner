@@ -1,0 +1,134 @@
+{% extends 'campaigns/base.html' %}
+{% load static %}
+{% block title %}{{ campaign.name }} | Campaign Report{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'campaigns/css/report.css' %}">{% endblock %}
+{% block content %}
+<main class="campaign-report py-5"><div class="container">
+    <div class="report-actions d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <a class="btn btn-link px-0" href="{% url campaign_detail_url_name campaign.id %}">&larr; Back to campaign</a>
+        <button class="btn btn-primary" type="button" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+    <header class="mb-4">
+        <p class="text-uppercase text-secondary fw-semibold mb-1">Campaign Report</p>
+        <h1 class="h2 fw-bold">{{ campaign.name }}</h1>
+        <p class="text-secondary mb-0">Generated {{ generated_at|date:"M j, Y, H:i T" }} &middot; Campaign #{{ campaign.pk }}</p>
+        <p class="text-secondary small mt-1 mb-0">Based on the current campaign, task, and deliverable records.</p>
+    </header>
+
+    <section class="card border-0 shadow-sm mb-4" aria-labelledby="campaign-information">
+        <div class="card-body p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+                <h2 class="h5 fw-bold mb-0" id="campaign-information">Campaign Information</h2>
+                {% include 'campaigns/includes/status_badge.html' with status=campaign.status label=campaign.get_status_display extra_classes="align-self-start" only %}
+            </div>
+            <h3 class="h6 text-secondary">Description</h3>
+            <p>{{ campaign.description|linebreaksbr }}</p>
+            <dl class="row mb-0">
+                <dt class="col-sm-4">Campaign type</dt><dd class="col-sm-8">{{ campaign.campaign_type|default:"Not specified" }}</dd>
+                <dt class="col-sm-4">Target audience</dt><dd class="col-sm-8">{{ campaign.target_audience|default:"Not specified" }}</dd>
+                <dt class="col-sm-4">Budget</dt><dd class="col-sm-8">{% if campaign.budget != None %}{{ campaign.budget|floatformat:2 }}{% else %}Not specified{% endif %}</dd>
+                <dt class="col-sm-4">Start date</dt><dd class="col-sm-8">{{ campaign.start_date|date:"M j, Y"|default:"Not specified" }}</dd>
+                <dt class="col-sm-4">End date</dt><dd class="col-sm-8">{{ campaign.end_date|date:"M j, Y"|default:"Not specified" }}</dd>
+            </dl>
+        </div>
+    </section>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <section class="card border-0 shadow-sm h-100" aria-labelledby="client-information"><div class="card-body p-4">
+                <h2 class="h5 fw-bold mb-3" id="client-information">Client Information</h2>
+                <dl class="mb-0">
+                    <dt>Username</dt><dd>{{ campaign.client.username }}</dd>
+                    <dt>Full name</dt><dd>{{ campaign.client.get_full_name|default:"Not provided" }}</dd>
+                    <dt>Email</dt><dd class="mb-0">{{ campaign.client.email|default:"Not provided" }}</dd>
+                </dl>
+            </div></section>
+        </div>
+        <div class="col-lg-6">
+            <section class="card border-0 shadow-sm h-100" aria-labelledby="assigned-employee"><div class="card-body p-4">
+                <h2 class="h5 fw-bold mb-3" id="assigned-employee">Assigned Employee</h2>
+                {% if campaign.assigned_employee %}
+                    <dl class="mb-0">
+                        <dt>Marketing employee</dt><dd>{{ campaign.assigned_employee }}</dd>
+                        <dt>Job title</dt><dd>{{ campaign.assigned_employee.job_title|default:"Not provided" }}</dd>
+                        <dt>Email</dt><dd class="mb-0">{{ campaign.assigned_employee.user.email|default:"Not provided" }}</dd>
+                    </dl>
+                {% else %}<p class="text-secondary mb-0">No employee assigned.</p>{% endif %}
+            </div></section>
+        </div>
+    </div>
+
+    <section class="card border-0 shadow-sm mb-4" aria-labelledby="campaign-progress"><div class="card-body p-4">
+        <h2 class="h5 fw-bold mb-3" id="campaign-progress">Campaign Progress</h2>
+        <div class="d-flex justify-content-between gap-3 mb-2"><span>Current campaign progress</span><strong>{{ campaign.progress_percentage }}%</strong></div>
+        <div class="progress" role="progressbar" aria-label="Campaign progress" aria-valuenow="{{ campaign.progress_percentage }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width: {{ campaign.progress_percentage }}%"></div></div>
+        <div class="d-flex justify-content-between gap-3 mt-4 mb-2"><span>Task completion</span><strong>{{ task_completion_percentage|floatformat:"-1u" }}%</strong></div>
+        <div class="progress" role="progressbar" aria-label="Task completion" aria-valuenow="{{ task_completion_percentage|floatformat:'-1u' }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar bg-success" style="width: {{ task_completion_percentage|floatformat:'-1u' }}%"></div></div>
+        <p class="text-secondary small mt-3 mb-0">Campaign progress is the recorded campaign value. Task completion is calculated from completed tasks.</p>
+    </div></section>
+
+    <section class="card border-0 shadow-sm mb-4" aria-labelledby="task-summary"><div class="card-body p-4">
+        <h2 class="h5 fw-bold mb-3" id="task-summary">Task Summary</h2>
+        <p class="fw-semibold">{{ task_summary.completed }} of {{ task_summary.total }} tasks completed</p>
+        <div class="row g-3 text-center">
+            <div class="col-6 col-md-3"><p class="h3 fw-bold mb-1">{{ task_summary.total }}</p><span class="text-secondary">Total tasks</span></div>
+            <div class="col-6 col-md-3"><p class="h3 fw-bold mb-1">{{ task_summary.pending }}</p><span class="badge text-bg-warning">Pending</span></div>
+            <div class="col-6 col-md-3"><p class="h3 fw-bold mb-1">{{ task_summary.in_progress }}</p><span class="badge text-bg-info">In Progress</span></div>
+            <div class="col-6 col-md-3"><p class="h3 fw-bold mb-1">{{ task_summary.completed }}</p><span class="badge text-bg-success">Completed</span></div>
+        </div>
+    </div></section>
+
+    <section class="card report-table-card border-0 shadow-sm mb-4" aria-labelledby="task-details">
+        <div class="card-header bg-white p-4"><h2 class="h5 fw-bold mb-0" id="task-details">Task Details</h2></div>
+        <div class="table-responsive"><table class="table align-middle mb-0">
+            <caption class="visually-hidden">Tasks for {{ campaign.name }}</caption>
+            <thead class="table-light"><tr><th scope="col">Task / Description</th><th scope="col">Assigned employee</th><th scope="col">Due date</th><th scope="col">Status</th></tr></thead>
+            <tbody>
+                {% for task in tasks %}
+                    <tr>
+                        <td><p class="fw-semibold mb-1">{{ task.title }}</p><p class="text-secondary mb-0">{{ task.description|default:"No description"|linebreaksbr }}</p></td>
+                        <td>{{ task.assigned_employee|default:"Unassigned" }}</td>
+                        <td>{{ task.due_date|date:"M j, Y" }}</td>
+                        <td>{% include 'campaigns/includes/status_badge.html' with status=task.status label=task.get_status_display extra_classes="align-self-start" only %}</td>
+                    </tr>
+                {% empty %}<tr><td colspan="4" class="text-secondary text-center py-4">No tasks have been created for this campaign.</td></tr>{% endfor %}
+            </tbody>
+        </table></div>
+    </section>
+
+    <section class="card border-0 shadow-sm mb-4" aria-labelledby="deliverable-summary"><div class="card-body p-4">
+        <h2 class="h5 fw-bold mb-3" id="deliverable-summary">Deliverable Approval Summary</h2>
+        <div class="row g-3 text-center">
+            <div class="col-6 col-md-3"><p class="h3 fw-bold mb-1">{{ deliverable_summary.total }}</p><span class="text-secondary">Total uploaded deliverables</span></div>
+            <div class="col-6 col-md-3"><p class="h3 fw-bold mb-1">{{ deliverable_summary.pending }}</p><span class="badge text-bg-warning">Pending Review</span></div>
+            <div class="col-6 col-md-3"><p class="h3 fw-bold mb-1">{{ deliverable_summary.approved }}</p><span class="badge text-bg-success">Approved</span></div>
+            <div class="col-6 col-md-3"><p class="h3 fw-bold mb-1">{{ deliverable_summary.rejected }}</p><span class="badge text-bg-danger">Rejected</span></div>
+        </div>
+    </div></section>
+
+    <section class="card report-table-card border-0 shadow-sm mb-4" aria-labelledby="deliverables">
+        <div class="card-header bg-white p-4"><h2 class="h5 fw-bold mb-0" id="deliverables">Deliverables</h2></div>
+        <div class="table-responsive"><table class="table align-middle mb-0">
+            <caption class="visually-hidden">Deliverables for {{ campaign.name }}</caption>
+            <thead class="table-light"><tr><th scope="col">Title / Description</th><th scope="col">Uploaded by</th><th scope="col">Uploaded date</th><th scope="col">Approval status</th><th scope="col">File</th></tr></thead>
+            <tbody>
+                {% for deliverable in deliverables %}
+                    <tr>
+                        <td><p class="fw-semibold mb-1">{{ deliverable.title }}</p><p class="text-secondary mb-0">{{ deliverable.description|default:"No description"|linebreaksbr }}</p></td>
+                        <td>{{ deliverable.uploaded_by }}</td>
+                        <td>{{ deliverable.uploaded_at|date:"M j, Y, H:i T" }}</td>
+                        <td>{% include 'campaigns/includes/status_badge.html' with status=deliverable.approval_status label=deliverable.get_approval_status_display extra_classes="align-self-start" only %}</td>
+                        <td>{% if deliverable.uploaded_file %}<a href="{{ deliverable.uploaded_file.url }}" target="_blank" rel="noopener noreferrer">Open file<span class="visually-hidden">: {{ deliverable.title }} (opens in a new tab)</span></a>{% else %}<span class="text-secondary">No file available</span>{% endif %}</td>
+                    </tr>
+                {% empty %}<tr><td colspan="5" class="text-secondary text-center py-4">No deliverables have been uploaded for this campaign.</td></tr>{% endfor %}
+            </tbody>
+        </table></div>
+    </section>
+
+    <section class="card border-0 shadow-sm" aria-labelledby="overall-status"><div class="card-body p-4">
+        <h2 class="h5 fw-bold mb-3" id="overall-status">Overall Status</h2>
+        <p>Campaign status: <strong>{{ campaign.get_status_display }}</strong>. Recorded progress: <strong>{{ campaign.progress_percentage }}%</strong>.</p>
+        <p class="mb-0">{{ task_summary.completed }} of {{ task_summary.total }} tasks completed ({{ task_completion_percentage|floatformat:"-1u" }}%). Deliverables: {{ deliverable_summary.approved }} approved, {{ deliverable_summary.pending }} pending review, {{ deliverable_summary.rejected }} rejected.</p>
+    </div></section>
+</div></main>
+{% endblock %}

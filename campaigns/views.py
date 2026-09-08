@@ -1,8 +1,9 @@
 from django.contrib.auth import login
 from django.contrib import messages
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST, require_safe
 
 from .forms import (
     AdministratorEmployeeForm,
@@ -19,6 +20,7 @@ from .forms import (
     DeliverableUploadForm,
 )
 from .models import Campaign, Deliverable, EmployeeProfile, Task
+from .reports import campaign_report_context
 
 
 def staff_required(view_func):
@@ -141,8 +143,55 @@ def client_deliverable_decision(request, campaign_id, deliverable_id, decision):
     else:
         deliverable.approval_status = decisions[decision]
         deliverable.save(update_fields=("approval_status",))
-        messages.success(request, f'Deliverable "{deliverable.title}" was {decision}d.')
+        messages.success(request, f'Deliverable "{deliverable.title}" was {deliverable.get_approval_status_display().lower()}.')
     return redirect("client_campaign_detail", campaign_id=campaign_id)
+
+
+@login_required(login_url="login")
+@require_safe
+def deliverable_file(request, file_path):
+    """Apply campaign access rules to the existing uploaded-file URLs."""
+    deliverables = Deliverable.objects.filter(uploaded_file=file_path)
+    if request.user.is_staff or request.user.is_superuser:
+        pass
+    elif hasattr(request.user, "employee_profile"):
+        deliverables = deliverables.filter(
+            campaign__assigned_employee=request.user.employee_profile,
+        )
+    else:
+        deliverables = deliverables.filter(campaign__client=request.user)
+    deliverable = get_object_or_404(deliverables)
+    try:
+        response = FileResponse(deliverable.uploaded_file.open("rb"))
+    except FileNotFoundError as error:
+        raise Http404("File not found.") from error
+    response["Cache-Control"] = "private, no-store"
+    return response
+
+
+@client_required
+@require_GET
+def client_campaign_report(request, campaign_id):
+    campaign = get_object_or_404(
+        Campaign.objects.select_related("client", "assigned_employee__user"),
+        pk=campaign_id,
+        client=request.user,
+    )
+    context = campaign_report_context(campaign)
+    context["campaign_detail_url_name"] = "client_campaign_detail"
+    return render(request, "campaigns/campaign_report.html", context)
+
+
+@staff_required
+@require_GET
+def administrator_campaign_report(request, campaign_id):
+    campaign = get_object_or_404(
+        Campaign.objects.select_related("client", "assigned_employee__user"),
+        pk=campaign_id,
+    )
+    context = campaign_report_context(campaign)
+    context["campaign_detail_url_name"] = "administrator_campaign_detail"
+    return render(request, "campaigns/campaign_report.html", context)
 
 
 @staff_required
@@ -153,7 +202,9 @@ def administrator_dashboard(request):
         "total_campaigns": campaigns.count(),
         "pending_campaigns": campaigns.filter(status=Campaign.Status.PENDING).count(),
         "approved_campaigns": campaigns.filter(status=Campaign.Status.APPROVED).count(),
+        "in_progress_campaigns": campaigns.filter(status=Campaign.Status.IN_PROGRESS).count(),
         "completed_campaigns": campaigns.filter(status=Campaign.Status.COMPLETED).count(),
+        "rejected_campaigns": campaigns.filter(status=Campaign.Status.REJECTED).count(),
     }
     return render(request, "campaigns/administrator_dashboard.html", context)
 
@@ -200,8 +251,8 @@ def administrator_task_create(request, campaign_id):
     })
 
 
-@require_POST
 @staff_required
+@require_POST
 def administrator_campaign_decision(request, campaign_id, decision):
     campaign = get_object_or_404(Campaign, pk=campaign_id)
     decisions = {
@@ -213,7 +264,7 @@ def administrator_campaign_decision(request, campaign_id, decision):
     else:
         campaign.status = decisions[decision]
         campaign.save(update_fields=("status", "updated_at"))
-        messages.success(request, f'Campaign "{campaign.name}" was {decision}d.')
+        messages.success(request, f'Campaign "{campaign.name}" was {campaign.get_status_display().lower()}.')
     return redirect("administrator_campaign_detail", campaign_id=campaign.pk)
 
 

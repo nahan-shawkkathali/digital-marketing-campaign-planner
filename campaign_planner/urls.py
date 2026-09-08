@@ -15,13 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.conf import settings
-from django.conf.urls.static import static
 from django.urls import include, path
+from campaigns.views import deliverable_file
 
 urlpatterns = [
     path('', include('campaigns.urls')),
     path('admin/', admin.site.urls),
+    # Keep existing file links, but check campaign permissions before serving.
+    path(settings.MEDIA_URL.lstrip('/') + '<path:file_path>', deliverable_file, name='deliverable_file'),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
