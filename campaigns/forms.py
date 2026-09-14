@@ -69,6 +69,14 @@ class CampaignStatusForm(forms.ModelForm):
         fields = ("status",)
         widgets = {"status": forms.Select(attrs={"class": "form-select"})}
 
+    def save(self, commit=True):
+        campaign = super().save(commit=False)
+        if campaign.status == Campaign.Status.COMPLETED:
+            campaign.progress_percentage = 100
+        if commit:
+            campaign.save()
+        return campaign
+
 
 class CampaignRequestForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
@@ -81,9 +89,13 @@ class CampaignRequestForm(BootstrapFormMixin, forms.ModelForm):
             "budget",
             "start_date",
             "end_date",
+            "platforms",
+            "campaign_goal",
         )
+        labels = {"platforms": "Platforms", "campaign_goal": "Campaign Goal"}
         widgets = {
             "description": forms.Textarea(attrs={"rows": 5}),
+            "campaign_goal": forms.Textarea(attrs={"rows": 4}),
             "start_date": forms.DateInput(attrs={"type": "date"}),
             "end_date": forms.DateInput(attrs={"type": "date"}),
         }
@@ -91,6 +103,12 @@ class CampaignRequestForm(BootstrapFormMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.apply_bootstrap_styles()
+
+    def clean_budget(self):
+        budget = self.cleaned_data["budget"]
+        if budget is not None and budget < 0:
+            raise forms.ValidationError("Budget cannot be negative.")
+        return budget
 
     def clean(self):
         cleaned_data = super().clean()
@@ -150,7 +168,7 @@ class EmployeeCreationForm(BootstrapFormMixin, UserCreationForm):
 class EmployeeProfileForm(BootstrapFormMixin, forms.ModelForm):
     first_name = forms.CharField(max_length=150, required=True)
     last_name = forms.CharField(max_length=150, required=False)
-    email = forms.EmailField(required=True)
+    email = forms.EmailField(required=True, max_length=254)
 
     class Meta:
         model = EmployeeProfile
@@ -215,12 +233,16 @@ class CampaignAssignmentForm(forms.ModelForm):
 
     def clean_assigned_employee(self):
         employee = self.cleaned_data["assigned_employee"]
-        if employee and self.instance.status != Campaign.Status.APPROVED:
+        if employee and self.instance.status not in (Campaign.Status.APPROVED, Campaign.Status.IN_PROGRESS):
             raise forms.ValidationError("Only approved campaigns can be assigned.")
         return employee
 
 
 class EmployeeCampaignProgressForm(forms.ModelForm):
+    progress_percentage = forms.IntegerField(
+        min_value=0, max_value=100,
+        widget=forms.NumberInput(attrs={"class": "form-control"}),
+    )
     status = forms.ChoiceField(
         choices=(
             (Campaign.Status.IN_PROGRESS, Campaign.Status.IN_PROGRESS.label),
@@ -232,13 +254,12 @@ class EmployeeCampaignProgressForm(forms.ModelForm):
     class Meta:
         model = Campaign
         fields = ("progress_percentage", "status")
-        widgets = {
-            "progress_percentage": forms.NumberInput(attrs={"class": "form-control", "min": 0, "max": 100}),
-        }
 
     def clean(self):
         cleaned_data = super().clean()
-        if cleaned_data.get("status") == Campaign.Status.COMPLETED:
+        if self.instance.status in (Campaign.Status.PENDING, Campaign.Status.REJECTED):
+            raise forms.ValidationError("This campaign must be approved before work can be updated.")
+        if cleaned_data.get("status") == Campaign.Status.COMPLETED and "progress_percentage" in cleaned_data:
             cleaned_data["progress_percentage"] = 100
         return cleaned_data
 
@@ -270,13 +291,18 @@ class AdministratorTaskForm(BootstrapFormMixin, forms.ModelForm):
 
     def __init__(self, *args, campaign, **kwargs):
         super().__init__(*args, **kwargs)
-        self.campaign = campaign
-        employees = EmployeeProfile.objects.filter(user__is_active=True)
-        if campaign.assigned_employee_id:
-            employees = employees.filter(pk=campaign.assigned_employee_id)
+        employees = EmployeeProfile.objects.filter(
+            user__is_active=True, pk=campaign.assigned_employee_id,
+        )
         self.fields["assigned_employee"].queryset = employees.select_related("user")
         self.fields["assigned_employee"].required = True
         self.apply_bootstrap_styles()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not self.fields["assigned_employee"].queryset.exists():
+            raise forms.ValidationError("Assign an active employee to this campaign before creating tasks.")
+        return cleaned_data
 
 
 class EmployeeTaskStatusForm(forms.ModelForm):

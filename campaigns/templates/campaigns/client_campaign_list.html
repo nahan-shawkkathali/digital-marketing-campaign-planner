@@ -1,22 +1,31 @@
 {% extends 'campaigns/base.html' %}
-{% block title %}My Campaigns | Campaign Planner{% endblock %}
+{% block title %}{% if tracking %}Track Campaign Progress{% else %}My Campaigns{% endif %} | Campaign Planner{% endblock %}
 {% block content %}
 <main class="py-5">
     <div class="container">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-            <div><a class="btn btn-link px-0" href="{% url 'client_dashboard' %}">&larr; Back to dashboard</a><h1 class="h2 fw-bold mb-0">My Campaigns</h1></div>
+            <div><a class="btn btn-link px-0" href="{% url 'client_dashboard' %}">&larr; Back to dashboard</a><h1 class="h2 fw-bold mb-0">{% if tracking %}Track Campaign Progress{% else %}My Campaigns{% endif %}</h1></div>
             <a class="btn btn-primary" href="{% url 'campaign_request' %}">Request Campaign</a>
         </div>
+        <p class="text-secondary mb-4">{% if tracking %}Follow campaign execution, employee assignments, and task completion.{% else %}An overview of your campaign requests, dates, and current status.{% endif %}</p>
         {% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}
         <div class="card border-0 shadow-sm">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light"><tr><th>Campaign</th><th>Submitted</th><th>Deadline</th><th>Status</th><th>Progress</th><th class="text-end">Actions</th></tr></thead>
+                    <thead class="table-light"><tr><th>Campaign</th><th>{% if tracking %}Assigned employee{% else %}Submitted{% endif %}</th><th>Deadline</th><th>Status</th><th>Progress</th>{% if tracking %}<th>Tasks completed</th>{% endif %}<th class="text-end">Actions</th></tr></thead>
                     <tbody>
                         {% for campaign in campaigns %}
-                            <tr><td class="fw-semibold"><a href="{% url 'client_campaign_detail' campaign.id %}">{{ campaign.name }}</a></td><td>{{ campaign.created_at|date:"M j, Y" }}</td><td>{{ campaign.end_date|date:"M j, Y"|default:"Not specified" }}</td><td>{% include 'campaigns/includes/status_badge.html' with status=campaign.status label=campaign.get_status_display extra_classes="align-self-start" only %}</td><td>{{ campaign.progress_percentage }}%</td><td class="text-end"><div class="d-flex flex-wrap justify-content-end gap-2"><a class="btn btn-sm btn-outline-primary" href="{% url 'client_campaign_detail' campaign.id %}">View details</a><a class="btn btn-sm btn-outline-primary" href="{% url 'client_campaign_report' campaign.id %}">View Report</a></div></td></tr>
+                            <tr>
+                                <td class="fw-semibold"><a href="{% url 'client_campaign_detail' campaign.id %}">{{ campaign.name }}</a></td>
+                                <td>{% if tracking %}{{ campaign.assigned_employee|default:"Not assigned" }}{% else %}{{ campaign.created_at|date:"M j, Y" }}{% endif %}</td>
+                                <td>{{ campaign.end_date|date:"M j, Y"|default:"Not specified" }}</td>
+                                <td>{% include 'campaigns/includes/status_badge.html' with status=campaign.status label=campaign.get_status_display extra_classes="align-self-start" only %}</td>
+                                <td style="min-width:150px">{{ campaign.progress_percentage }}%{% if tracking %}<div class="progress mt-1" role="progressbar" aria-label="Campaign progress" aria-valuenow="{{ campaign.progress_percentage }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:{{ campaign.progress_percentage }}%"></div></div>{% endif %}</td>
+                                {% if tracking %}<td style="min-width:150px">{% widthratio campaign.completed_tasks campaign.total_tasks 100 as task_percentage %}{{ campaign.completed_tasks }} / {{ campaign.total_tasks }}<div class="progress mt-1" role="progressbar" aria-label="Task completion" aria-valuenow="{{ task_percentage }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar bg-success" style="width:{{ task_percentage }}%"></div></div><small class="text-secondary">{{ task_percentage }}% of tasks completed</small></td>{% endif %}
+                                <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'client_campaign_detail' campaign.id %}">View Details</a></td>
+                            </tr>
                         {% empty %}
-                            <tr><td class="text-center text-secondary py-5" colspan="6">You have not submitted any campaign requests yet.</td></tr>
+                            <tr><td class="text-center text-secondary py-5" colspan="{% if tracking %}7{% else %}6{% endif %}">No campaigns found. You have not submitted any campaign requests yet.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>

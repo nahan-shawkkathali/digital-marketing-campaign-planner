@@ -1,0 +1,54 @@
+[
+  {
+    "page": "report",
+    "width": 1440,
+    "documentWidth": 1425,
+    "bootstrapLoaded": true
+  },
+  {
+    "page": "report",
+    "width": 390,
+    "documentWidth": 390,
+    "bootstrapLoaded": true,
+    "mobileMenuWorks": true
+  },
+  {
+    "page": "tracking",
+    "width": 1440,
+    "documentWidth": 1440,
+    "bootstrapLoaded": true
+  },
+  {
+    "page": "tracking",
+    "width": 390,
+    "documentWidth": 390,
+    "bootstrapLoaded": true,
+    "mobileMenuWorks": true
+  },
+  {
+    "page": "employee",
+    "width": 1440,
+    "documentWidth": 1440,
+    "bootstrapLoaded": true
+  },
+  {
+    "page": "employee",
+    "width": 390,
+    "documentWidth": 390,
+    "bootstrapLoaded": true,
+    "mobileMenuWorks": true
+  },
+  {
+    "page": "administrator",
+    "width": 1440,
+    "documentWidth": 1440,
+    "bootstrapLoaded": true
+  },
+  {
+    "page": "administrator",
+    "width": 390,
+    "documentWidth": 390,
+    "bootstrapLoaded": true,
+    "mobileMenuWorks": true
+  }
+]

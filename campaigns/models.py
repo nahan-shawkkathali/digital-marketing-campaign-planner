@@ -34,6 +34,8 @@ class Campaign(models.Model):
     description = models.TextField()
     campaign_type = models.CharField(max_length=100, blank=True)
     target_audience = models.CharField(max_length=255, blank=True)
+    platforms = models.CharField(max_length=255, blank=True)
+    campaign_goal = models.TextField(blank=True)
     budget = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)

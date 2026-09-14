@@ -26,6 +26,8 @@
             <dl class="row mb-0">
                 <dt class="col-sm-4">Campaign type</dt><dd class="col-sm-8">{{ campaign.campaign_type|default:"Not specified" }}</dd>
                 <dt class="col-sm-4">Target audience</dt><dd class="col-sm-8">{{ campaign.target_audience|default:"Not specified" }}</dd>
+                <dt class="col-sm-4">Platforms</dt><dd class="col-sm-8 text-break">{{ campaign.platforms|default:"Not specified" }}</dd>
+                <dt class="col-sm-4">Campaign Goal</dt><dd class="col-sm-8 text-break">{{ campaign.campaign_goal|default:"Not specified"|linebreaksbr }}</dd>
                 <dt class="col-sm-4">Budget</dt><dd class="col-sm-8">{% if campaign.budget != None %}{{ campaign.budget|floatformat:2 }}{% else %}Not specified{% endif %}</dd>
                 <dt class="col-sm-4">Start date</dt><dd class="col-sm-8">{{ campaign.start_date|date:"M j, Y"|default:"Not specified" }}</dd>
                 <dt class="col-sm-4">End date</dt><dd class="col-sm-8">{{ campaign.end_date|date:"M j, Y"|default:"Not specified" }}</dd>

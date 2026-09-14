@@ -11,6 +11,10 @@
     min-width: 14rem;
 }
 
+.campaign-report .table-responsive {
+    position: relative;
+}
+
 @media print {
     @page {
         margin: 15mm;

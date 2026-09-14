@@ -13,6 +13,7 @@
             {% include 'campaigns/includes/status_badge.html' with status=campaign.status label=campaign.get_status_display extra_classes="fs-6 align-self-start" only %}
         </div>
         <h2 class="h6 text-uppercase text-secondary">Description</h2><p class="mb-4">{{ campaign.description|linebreaksbr }}</p>
+        {% include 'campaigns/includes/campaign_requirements.html' with campaign=campaign only %}
         <div class="row g-4">
             <div class="col-md-4"><h2 class="h6 text-uppercase text-secondary">Campaign type</h2><p>{{ campaign.campaign_type|default:"Not specified" }}</p></div>
             <div class="col-md-4"><h2 class="h6 text-uppercase text-secondary">Budget</h2><p>{{ campaign.budget|default_if_none:"Not specified" }}</p></div>

@@ -49,7 +49,9 @@ class AuditFixtures(TestCase):
         return {
             "client": [
                 ("client_dashboard", ()), ("client_profile", ()), ("campaign_request", ()),
-                ("client_campaign_list", ()), ("client_campaign_detail", (campaign_id,)),
+                ("client_campaign_list", ()), ("client_campaign_tracking", ()),
+                ("client_deliverables", ()), ("client_reports", ()),
+                ("client_campaign_detail", (campaign_id,)),
                 ("client_campaign_report", (campaign_id,)),
             ],
             "administrator": [
@@ -62,6 +64,7 @@ class AuditFixtures(TestCase):
             ],
             "employee": [
                 ("employee_dashboard", ()), ("employee_profile", ()), ("employee_task_list", ()),
+                ("employee_deliverable_campaigns", ()),
                 ("employee_task_detail", (task_id,)),
                 ("employee_campaign_detail", (campaign_id,)),
                 ("employee_deliverable_upload", (campaign_id,)),
@@ -97,13 +100,17 @@ class FinalWorkflowAuditTests(AuditFixtures):
         other = Campaign.objects.create(client=self.other_client, name="Private Campaign", description="Private")
         self.client.force_login(self.owner)
         dashboard = self.client.get(reverse("client_dashboard"))
-        for label in ("Track Campaigns", "View Reports", "Review Campaigns"):
+        for label, destination in (
+            ("View Campaigns", "client_campaign_list"),
+            ("Track Campaigns", "client_campaign_tracking"),
+            ("View Reports", "client_reports"), ("Review Deliverables", "client_deliverables"),
+        ):
             self.assertContains(
                 dashboard,
-                f'<a class="btn btn-outline-primary" href="{reverse("client_campaign_list")}">{label}</a>',
+                f'<a class="btn btn-outline-primary" href="{reverse(destination)}">{label}</a>',
                 html=True,
             )
-        campaigns = self.client.get(reverse("client_campaign_list"))
+        campaigns = self.client.get(reverse("client_reports"))
         self.assertContains(campaigns, f'href="{reverse("client_campaign_report", args=(self.campaign.pk,))}"')
         self.assertNotContains(campaigns, f'href="{reverse("client_campaign_report", args=(other.pk,))}"')
 
@@ -311,6 +318,9 @@ class FinalWorkflowAuditTests(AuditFixtures):
         self.client.force_login(self.owner)
         client_detail = reverse("client_campaign_detail", args=(campaign.pk,))
         self.assertContains(self.client.get(client_detail), "65%")
+        tracking = self.client.get(reverse("client_campaign_tracking"))
+        self.assertContains(tracking, "65%")
+        self.assertContains(tracking, "1 / 1")
         for title, decision in (("Final Creative", "approve"), ("Alternative Creative", "reject")):
             deliverable = campaign.deliverables.get(title=title)
             file_response = self.client.get(deliverable.uploaded_file.url)
@@ -332,6 +342,15 @@ class FinalWorkflowAuditTests(AuditFixtures):
             self.assertContains(report, "65%")
             self.assertContains(report, "Anita Rao")
             self.assertContains(report, "window.print()")
+
+        self.client.force_login(self.employee_user)
+        self.assertRedirects(self.client.post(employee_detail, {
+            "progress_percentage": 65, "status": Campaign.Status.COMPLETED,
+        }), employee_detail)
+        self.client.force_login(self.staff)
+        final_report = self.client.get(reverse("administrator_campaign_report", args=(campaign.pk,)))
+        self.assertEqual(final_report.context["campaign"].status, Campaign.Status.COMPLETED)
+        self.assertEqual(final_report.context["campaign"].progress_percentage, 100)
 
 
 class ProtectedDeliverableFileTests(AuditFixtures):

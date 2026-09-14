@@ -14,6 +14,7 @@
                 </div>
                 <div class="mb-4">{% include 'campaigns/includes/status_badge.html' with status=campaign.status label=campaign.get_status_display only %}</div>
                 <h2 class="h6 text-uppercase text-secondary">Description</h2><p class="mb-4">{{ campaign.description|linebreaksbr }}</p>
+                {% include 'campaigns/includes/campaign_requirements.html' with campaign=campaign only %}
                 <div class="row g-4">
                     <div class="col-md-6"><h2 class="h6 text-uppercase text-secondary">Client</h2><p>{{ campaign.client.get_full_name|default:campaign.client.username }}</p></div>
                     <div class="col-md-6"><h2 class="h6 text-uppercase text-secondary">Target audience</h2><p>{{ campaign.target_audience|default:"Not specified" }}</p></div>
