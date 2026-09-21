@@ -1,5 +1,5 @@
 {% extends 'campaigns/base.html' %}
-{% block title %}Request Campaign | Campaign Planner{% endblock %}
+{% block title %}{% if editing %}Edit Campaign{% else %}Request Campaign{% endif %} | Campaign Planner{% endblock %}
 {% block content %}
 <main class="py-5">
     <div class="container">
@@ -8,7 +8,7 @@
                 <a class="btn btn-link px-0 mb-3" href="{% url 'client_dashboard' %}">&larr; Back to dashboard</a>
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-4 p-lg-5">
-                        <h1 class="h3 fw-bold mb-2">Request a Campaign</h1>
+                        <h1 class="h3 fw-bold mb-2">{% if editing %}Edit Campaign{% else %}Request a Campaign{% endif %}</h1>
                         <p class="text-secondary mb-4">Enter the goals and requirements for your marketing campaign.</p>
                         <form method="post" novalidate>
                             {% csrf_token %}
@@ -21,7 +21,7 @@
                                     {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
                                 </div>
                             {% endfor %}
-                            <button class="btn btn-primary" type="submit">Submit Campaign Request</button>
+                            <button class="btn btn-primary" type="submit">{% if editing %}Save Changes{% else %}Submit Campaign Request{% endif %}</button>
                         </form>
                     </div>
                 </div>

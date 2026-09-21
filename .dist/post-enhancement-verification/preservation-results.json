@@ -1,0 +1,82 @@
+{
+  "result": "PASS",
+  "file_hashes": [
+    {
+      "file": "db.sqlite3",
+      "unchanged": true
+    },
+    {
+      "file": "media\\deliverables\\2026\\09\\01\\Screenshot_2024-10-24_125502.png",
+      "unchanged": true
+    },
+    {
+      "file": "media\\deliverables\\2026\\09\\02\\Screenshot_2025-03-05_194224.png",
+      "unchanged": true
+    },
+    {
+      "file": "campaigns\\migrations\\0001_initial.py",
+      "unchanged": true
+    },
+    {
+      "file": "campaigns\\migrations\\0002_campaign_progress_percentage_employeeprofile_and_more.py",
+      "unchanged": true
+    },
+    {
+      "file": "campaigns\\migrations\\0003_deliverable.py",
+      "unchanged": true
+    },
+    {
+      "file": "campaigns\\migrations\\0004_auto_20260901_2048.py",
+      "unchanged": true
+    },
+    {
+      "file": "campaigns\\migrations\\0005_campaign_campaign_type.py",
+      "unchanged": true
+    },
+    {
+      "file": "campaigns\\migrations\\0006_task.py",
+      "unchanged": true
+    },
+    {
+      "file": "campaigns\\migrations\\0007_campaign_campaign_goal_campaign_platforms.py",
+      "unchanged": true
+    },
+    {
+      "file": "campaigns\\migrations\\__init__.py",
+      "unchanged": true
+    }
+  ],
+  "existing_counts": {
+    "auth_user": 6,
+    "campaigns_employeeprofile": 2,
+    "campaigns_campaign": 3,
+    "campaigns_task": 1,
+    "campaigns_deliverable": 2
+  },
+  "sqlite_integrity": "ok",
+  "foreign_key_violations": 0,
+  "invalid_campaigns": 0,
+  "stale_task_assignments": 0,
+  "existing_deliverable_files_present": 2,
+  "campaign_columns": {
+    "platforms": "varchar(255)",
+    "campaign_goal": "TEXT"
+  },
+  "campaign_migrations": [
+    "0001_initial",
+    "0002_campaign_progress_percentage_employeeprofile_and_more",
+    "0003_deliverable",
+    "0004_auto_20260901_2048",
+    "0005_campaign_campaign_type",
+    "0006_task",
+    "0007_campaign_campaign_goal_campaign_platforms"
+  ],
+  "complete_tests": {
+    "total": 169,
+    "passed": 169,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 79.158
+  }
+}

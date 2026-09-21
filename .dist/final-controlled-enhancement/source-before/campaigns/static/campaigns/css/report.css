@@ -1,0 +1,106 @@
+.campaign-report {
+    overflow-wrap: anywhere;
+}
+
+.campaign-report .table th,
+.campaign-report .table td {
+    padding: 1rem;
+}
+
+.campaign-report .table td:first-child {
+    min-width: 14rem;
+}
+
+.campaign-report .table-responsive {
+    position: relative;
+}
+
+@media print {
+    @page {
+        margin: 15mm;
+    }
+
+    body {
+        background: #fff;
+        color: #000;
+    }
+
+    nav.navbar,
+    footer,
+    .report-actions {
+        display: none !important;
+    }
+
+    .campaign-report {
+        padding: 0 !important;
+        font-size: 10pt;
+    }
+
+    .campaign-report .container {
+        max-width: none;
+        padding: 0;
+    }
+
+    .campaign-report .row {
+        display: block;
+    }
+
+    .campaign-report .row > * {
+        width: 100%;
+    }
+
+    .campaign-report .card {
+        display: block;
+        height: auto !important;
+        box-shadow: none !important;
+        border: 1px solid #bbb !important;
+        break-inside: avoid;
+    }
+
+    .campaign-report .report-table-card {
+        break-inside: auto;
+    }
+
+    .campaign-report .table-responsive {
+        overflow: visible;
+    }
+
+    .campaign-report table {
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    .campaign-report .table td:first-child {
+        min-width: 0;
+    }
+
+    .campaign-report .table th,
+    .campaign-report .table td {
+        padding: 0.4rem;
+    }
+
+    .campaign-report thead {
+        display: table-header-group;
+    }
+
+    .campaign-report tr {
+        break-inside: avoid;
+    }
+
+    .campaign-report .badge {
+        white-space: normal;
+        color: #000 !important;
+        background: #fff !important;
+        border: 1px solid #777;
+    }
+
+    .campaign-report .progress {
+        border: 1px solid #777;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .campaign-report a {
+        color: #000;
+    }
+}

@@ -1,0 +1,25 @@
+{% extends 'campaigns/base.html' %}
+{% block title %}Manage Profile | Client Dashboard{% endblock %}
+{% block content %}
+<main class="py-5"><div class="container"><div class="row justify-content-center"><div class="col-lg-7">
+    <a class="btn btn-link px-0 mb-3" href="{% url 'client_dashboard' %}">&larr; Back to dashboard</a>
+    {% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}
+    <div class="card border-0 shadow-sm"><div class="card-body p-4 p-lg-5">
+        <h1 class="h3 fw-bold mb-2">Manage Profile</h1>
+        <p class="text-secondary mb-4">Keep your client account information current.</p>
+        <div class="mb-3">
+            <label class="form-label" for="client-username">Username</label>
+            <input class="form-control" id="client-username" type="text" value="{{ user.username }}" readonly>
+            <div class="form-text">Your username cannot be changed here.</div>
+        </div>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% for error in form.non_field_errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+            {% for field in form %}
+                <div class="mb-3"><label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}</div>
+            {% endfor %}
+            <button class="btn btn-primary" type="submit">Save Profile</button>
+        </form>
+    </div></div>
+</div></div></div></main>
+{% endblock %}

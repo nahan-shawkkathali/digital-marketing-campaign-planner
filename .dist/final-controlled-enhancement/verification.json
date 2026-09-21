@@ -1,0 +1,114 @@
+{
+  "tables": {
+    "django_migrations": {
+      "before": 26,
+      "after": 28,
+      "original_rows_and_values_preserved": true
+    },
+    "auth_group_permissions": {
+      "before": 0,
+      "after": 0,
+      "original_rows_and_values_preserved": true
+    },
+    "auth_user_groups": {
+      "before": 0,
+      "after": 0,
+      "original_rows_and_values_preserved": true
+    },
+    "auth_user_user_permissions": {
+      "before": 0,
+      "after": 0,
+      "original_rows_and_values_preserved": true
+    },
+    "django_admin_log": {
+      "before": 0,
+      "after": 0,
+      "original_rows_and_values_preserved": true
+    },
+    "django_content_type": {
+      "before": 11,
+      "after": 12,
+      "original_rows_and_values_preserved": true
+    },
+    "auth_permission": {
+      "before": 44,
+      "after": 48,
+      "original_rows_and_values_preserved": true
+    },
+    "auth_group": {
+      "before": 0,
+      "after": 0,
+      "original_rows_and_values_preserved": true
+    },
+    "auth_user": {
+      "before": 7,
+      "after": 7,
+      "original_rows_and_values_preserved": true
+    },
+    "django_session": {
+      "before": 27,
+      "after": 27,
+      "original_rows_and_values_preserved": true
+    },
+    "campaigns_deliverable": {
+      "before": 3,
+      "after": 3,
+      "original_rows_and_values_preserved": true
+    },
+    "campaigns_employeeprofile": {
+      "before": 2,
+      "after": 2,
+      "original_rows_and_values_preserved": true
+    },
+    "campaigns_task": {
+      "before": 1,
+      "after": 1,
+      "original_rows_and_values_preserved": true
+    },
+    "campaigns_campaign": {
+      "before": 5,
+      "after": 5,
+      "original_rows_and_values_preserved": true
+    },
+    "campaigns_clientprofile": {
+      "before": 0,
+      "after": 0,
+      "original_rows_and_values_preserved": true
+    }
+  },
+  "uploaded_files_preserved": 3,
+  "previous_migration_files_preserved": 9,
+  "database_integrity": "ok",
+  "existing_test_methods_preserved": 194,
+  "test_expectation_change": "Only the review UI action expectation changed from reject to request_changes; legacy rejection tests retained.",
+  "source_files_changed_this_request": [
+    "campaigns/forms.py",
+    "campaigns/migrations/0009_campaign_is_archived.py",
+    "campaigns/migrations/0010_deliverablemessage_deliverable_original_and_more.py",
+    "campaigns/models.py",
+    "campaigns/reports.py",
+    "campaigns/templates/campaigns/administrator_campaign_archive.html",
+    "campaigns/templates/campaigns/administrator_campaign_detail.html",
+    "campaigns/templates/campaigns/administrator_dashboard.html",
+    "campaigns/templates/campaigns/administrator_task_delete.html",
+    "campaigns/templates/campaigns/administrator_task_form.html",
+    "campaigns/templates/campaigns/campaign_report.html",
+    "campaigns/templates/campaigns/campaign_request.html",
+    "campaigns/templates/campaigns/client_campaign_detail.html",
+    "campaigns/templates/campaigns/client_campaign_list.html",
+    "campaigns/templates/campaigns/client_deliverables.html",
+    "campaigns/templates/campaigns/client_reports.html",
+    "campaigns/templates/campaigns/deliverable_discussion.html",
+    "campaigns/templates/campaigns/employee_campaign_detail.html",
+    "campaigns/templates/campaigns/employee_deliverable_upload.html",
+    "campaigns/templates/campaigns/employee_task_detail.html",
+    "campaigns/templates/campaigns/includes/deliverable_review_actions.html",
+    "campaigns/templates/campaigns/includes/status_badge.html",
+    "campaigns/test_campaign_management.py",
+    "campaigns/test_client_ux.py",
+    "campaigns/test_deliverable_revisions.py",
+    "campaigns/test_revision_workflow.py",
+    "campaigns/urls.py",
+    "campaigns/views.py"
+  ]
+}

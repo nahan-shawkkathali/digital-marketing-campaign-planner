@@ -8,8 +8,8 @@
         <div class="d-flex flex-wrap justify-content-between gap-3 mb-4"><div><p class="text-secondary mb-1">{{ task.campaign.name }}</p><h1 class="h3 fw-bold mb-0">{{ task.title }}</h1></div>{% include 'campaigns/includes/status_badge.html' with status=task.status label=task.get_status_display extra_classes="align-self-start" only %}</div>
         <h2 class="h6 text-uppercase text-secondary">Description</h2><p>{{ task.description|default:"No description"|linebreaksbr }}</p>
         <h2 class="h6 text-uppercase text-secondary mt-4">Due date</h2><p>{{ task.due_date|date:"M j, Y" }}</p>
-        <hr><h2 class="h5 fw-bold mb-3">Update Status</h2>
-        <form method="post" action="{% url 'employee_task_status_update' task.id %}">{% csrf_token %}{{ status_form.status }}<button class="btn btn-primary mt-3" type="submit">Update Status</button></form>
+        {% if not task.campaign.is_archived %}<hr><h2 class="h5 fw-bold mb-3">Update Status</h2>
+        <form method="post" action="{% url 'employee_task_status_update' task.id %}">{% csrf_token %}{{ status_form.status }}<button class="btn btn-primary mt-3" type="submit">Update Status</button></form>{% else %}<p class="text-secondary">Archived campaign ? task history is read-only.</p>{% endif %}
     </div></div>
 </div></div></div></main>
 {% endblock %}

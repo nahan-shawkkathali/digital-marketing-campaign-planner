@@ -1,0 +1,81 @@
+{
+  "original_tables": {
+    "django_migrations": {
+      "before": 25,
+      "after": 26,
+      "all_original_values_preserved": true
+    },
+    "auth_group_permissions": {
+      "before": 0,
+      "after": 0,
+      "all_original_values_preserved": true
+    },
+    "auth_user_groups": {
+      "before": 0,
+      "after": 0,
+      "all_original_values_preserved": true
+    },
+    "auth_user_user_permissions": {
+      "before": 0,
+      "after": 0,
+      "all_original_values_preserved": true
+    },
+    "django_admin_log": {
+      "before": 0,
+      "after": 0,
+      "all_original_values_preserved": true
+    },
+    "django_content_type": {
+      "before": 10,
+      "after": 11,
+      "all_original_values_preserved": true
+    },
+    "auth_permission": {
+      "before": 40,
+      "after": 44,
+      "all_original_values_preserved": true
+    },
+    "auth_group": {
+      "before": 0,
+      "after": 0,
+      "all_original_values_preserved": true
+    },
+    "auth_user": {
+      "before": 7,
+      "after": 7,
+      "all_original_values_preserved": true
+    },
+    "django_session": {
+      "before": 27,
+      "after": 27,
+      "all_original_values_preserved": true
+    },
+    "campaigns_deliverable": {
+      "before": 3,
+      "after": 3,
+      "all_original_values_preserved": true
+    },
+    "campaigns_employeeprofile": {
+      "before": 2,
+      "after": 2,
+      "all_original_values_preserved": true
+    },
+    "campaigns_task": {
+      "before": 1,
+      "after": 1,
+      "all_original_values_preserved": true
+    },
+    "campaigns_campaign": {
+      "before": 5,
+      "after": 5,
+      "all_original_values_preserved": true
+    }
+  },
+  "files_verified": 11,
+  "database_integrity": "ok",
+  "foreign_keys": "ok",
+  "legacy_campaign_products": "all empty strings",
+  "existing_clients": "no profile backfill required",
+  "media_files_verified": 3,
+  "old_migration_files_verified": 8
+}

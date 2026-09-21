@@ -35,7 +35,7 @@ class RoleLoginView(auth_views.LoginView):
         role = "administrator" if user.is_staff or user.is_superuser else (
             "employee" if hasattr(user, "employee_profile") else "client"
         )
-        if name in {"home", "deliverable_file"} or name.startswith(role + "_"):
+        if name in {"home", "deliverable_file", "deliverable_discussion"} or name.startswith(role + "_"):
             return destination
         if role == "client" and name == "campaign_request":
             return destination
@@ -60,6 +60,7 @@ urlpatterns = [
     path('client/campaigns/', views.client_campaign_list, name='client_campaign_list'),
     path('client/campaigns/track/', views.client_campaign_list, {"tracking": True}, name='client_campaign_tracking'),
     path('client/campaigns/<int:campaign_id>/', views.client_campaign_detail, name='client_campaign_detail'),
+    path('client/campaigns/<int:campaign_id>/edit/', views.client_campaign_edit, name='client_campaign_edit'),
     path('client/campaigns/<int:campaign_id>/report/', views.client_campaign_report, name='client_campaign_report'),
     path(
         'client/campaigns/<int:campaign_id>/deliverables/<int:deliverable_id>/<str:decision>/',
@@ -73,9 +74,13 @@ urlpatterns = [
         default_redirect_name='administrator_dashboard',
     ), name='administrator_login'),
     path('administrator/dashboard/', views.administrator_dashboard, name='administrator_dashboard'),
+    path('administrator/clients/create/', views.administrator_client_create, name='administrator_client_create'),
     path('administrator/campaigns/<int:campaign_id>/', views.administrator_campaign_detail, name='administrator_campaign_detail'),
     path('administrator/campaigns/<int:campaign_id>/report/', views.administrator_campaign_report, name='administrator_campaign_report'),
     path('administrator/campaigns/<int:campaign_id>/tasks/create/', views.administrator_task_create, name='administrator_task_create'),
+    path('administrator/campaigns/<int:campaign_id>/tasks/<int:task_id>/edit/', views.administrator_task_edit, name='administrator_task_edit'),
+    path('administrator/campaigns/<int:campaign_id>/tasks/<int:task_id>/delete/', views.administrator_task_delete, name='administrator_task_delete'),
+    path('administrator/campaigns/<int:campaign_id>/archive/', views.administrator_campaign_archive, name='administrator_campaign_archive'),
     path('administrator/campaigns/<int:campaign_id>/<str:decision>/', views.administrator_campaign_decision, name='administrator_campaign_decision'),
     path('administrator/employees/', views.administrator_employee_list, name='administrator_employee_list'),
     path('administrator/employees/create/', views.administrator_employee_create, name='administrator_employee_create'),
@@ -93,5 +98,7 @@ urlpatterns = [
     path('employee/tasks/<int:task_id>/status/', views.employee_task_status_update, name='employee_task_status_update'),
     path('employee/campaigns/<int:campaign_id>/', views.employee_campaign_detail, name='employee_campaign_detail'),
     path('employee/campaigns/<int:campaign_id>/deliverables/upload/', views.employee_deliverable_upload, name='employee_deliverable_upload'),
+    path('employee/campaigns/<int:campaign_id>/deliverables/<int:deliverable_id>/revise/', views.employee_deliverable_revision, name='employee_deliverable_revision'),
+    path('campaigns/<int:campaign_id>/deliverables/<int:deliverable_id>/discussion/', views.deliverable_discussion, name='deliverable_discussion'),
     path('employee/profile/', views.employee_profile, name='employee_profile'),
 ]

@@ -16,13 +16,13 @@
                     <tbody>
                         {% for campaign in campaigns %}
                             <tr>
-                                <td class="fw-semibold"><a href="{% url 'client_campaign_detail' campaign.id %}">{{ campaign.name }}</a></td>
+                                <td class="fw-semibold"><a href="{% url 'client_campaign_detail' campaign.id %}">{{ campaign.name }}{% if campaign.is_archived %} <span class="badge text-bg-secondary">Archived</span>{% endif %}</a></td>
                                 <td>{% if tracking %}{{ campaign.assigned_employee|default:"Not assigned" }}{% else %}{{ campaign.created_at|date:"M j, Y" }}{% endif %}</td>
                                 <td>{{ campaign.end_date|date:"M j, Y"|default:"Not specified" }}</td>
                                 <td>{% include 'campaigns/includes/status_badge.html' with status=campaign.status label=campaign.get_status_display extra_classes="align-self-start" only %}</td>
                                 <td style="min-width:150px">{{ campaign.progress_percentage }}%{% if tracking %}<div class="progress mt-1" role="progressbar" aria-label="Campaign progress" aria-valuenow="{{ campaign.progress_percentage }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:{{ campaign.progress_percentage }}%"></div></div>{% endif %}</td>
                                 {% if tracking %}<td style="min-width:150px">{% widthratio campaign.completed_tasks campaign.total_tasks 100 as task_percentage %}{{ campaign.completed_tasks }} / {{ campaign.total_tasks }}<div class="progress mt-1" role="progressbar" aria-label="Task completion" aria-valuenow="{{ task_percentage }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar bg-success" style="width:{{ task_percentage }}%"></div></div><small class="text-secondary">{{ task_percentage }}% of tasks completed</small></td>{% endif %}
-                                <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'client_campaign_detail' campaign.id %}">View Details</a></td>
+                                <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'client_campaign_detail' campaign.id %}">View Details</a>{% if campaign.status == 'pending' and not campaign.is_archived %} <a class="btn btn-sm btn-outline-primary" href="{% url 'client_campaign_edit' campaign.id %}">Edit</a>{% endif %}</td>
                             </tr>
                         {% empty %}
                             <tr><td class="text-center text-secondary py-5" colspan="{% if tracking %}7{% else %}6{% endif %}">No campaigns found. You have not submitted any campaign requests yet.</td></tr>

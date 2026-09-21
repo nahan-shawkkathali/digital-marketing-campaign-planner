@@ -1,0 +1,138 @@
+{
+  "home": {
+    "url": "/",
+    "file": "snapshots/home.html"
+  },
+  "register": {
+    "url": "/client/register/",
+    "file": "snapshots/register.html"
+  },
+  "client_dashboard": {
+    "url": "/client/dashboard/",
+    "file": "snapshots/client_dashboard.html"
+  },
+  "login": {
+    "url": "/client/login/",
+    "file": "snapshots/login.html"
+  },
+  "client_profile": {
+    "url": "/client/profile/",
+    "file": "snapshots/client_profile.html"
+  },
+  "client_campaign_list_empty": {
+    "url": "/client/campaigns/",
+    "file": "snapshots/client_campaign_list_empty.html"
+  },
+  "client_campaign_tracking_empty": {
+    "url": "/client/campaigns/track/",
+    "file": "snapshots/client_campaign_tracking_empty.html"
+  },
+  "client_deliverables_empty": {
+    "url": "/client/deliverables/",
+    "file": "snapshots/client_deliverables_empty.html"
+  },
+  "client_reports_empty": {
+    "url": "/client/reports/",
+    "file": "snapshots/client_reports_empty.html"
+  },
+  "campaign_request": {
+    "url": "/client/campaigns/request/",
+    "file": "snapshots/campaign_request.html"
+  },
+  "administrator_login": {
+    "url": "/administrator/login/",
+    "file": "snapshots/administrator_login.html"
+  },
+  "administrator_dashboard": {
+    "url": "/administrator/dashboard/",
+    "file": "snapshots/administrator_dashboard.html"
+  },
+  "administrator_campaign_detail": {
+    "url": "/administrator/campaigns/1/",
+    "file": "snapshots/administrator_campaign_detail.html"
+  },
+  "administrator_employee_create": {
+    "url": "/administrator/employees/create/",
+    "file": "snapshots/administrator_employee_create.html"
+  },
+  "administrator_task_create": {
+    "url": "/administrator/campaigns/1/tasks/create/",
+    "file": "snapshots/administrator_task_create.html"
+  },
+  "employee_login": {
+    "url": "/employee/login/",
+    "file": "snapshots/employee_login.html"
+  },
+  "employee_dashboard": {
+    "url": "/employee/dashboard/",
+    "file": "snapshots/employee_dashboard.html"
+  },
+  "employee_campaign_detail": {
+    "url": "/employee/campaigns/1/",
+    "file": "snapshots/employee_campaign_detail.html"
+  },
+  "employee_task_list": {
+    "url": "/employee/tasks/",
+    "file": "snapshots/employee_task_list.html"
+  },
+  "employee_task_detail": {
+    "url": "/employee/tasks/1/",
+    "file": "snapshots/employee_task_detail.html"
+  },
+  "employee_deliverable_campaigns": {
+    "url": "/employee/deliverables/",
+    "file": "snapshots/employee_deliverable_campaigns.html"
+  },
+  "employee_deliverable_upload": {
+    "url": "/employee/campaigns/1/deliverables/upload/",
+    "file": "snapshots/employee_deliverable_upload.html"
+  },
+  "client_campaign_tracking": {
+    "url": "/client/campaigns/track/",
+    "file": "snapshots/client_campaign_tracking.html"
+  },
+  "client_deliverables_pending": {
+    "url": "/client/deliverables/",
+    "file": "snapshots/client_deliverables_pending.html"
+  },
+  "client_campaign_report": {
+    "url": "/client/campaigns/1/report/",
+    "file": "snapshots/client_campaign_report.html"
+  },
+  "administrator_campaign_report": {
+    "url": "/administrator/campaigns/1/report/",
+    "file": "snapshots/administrator_campaign_report.html"
+  },
+  "client_campaign_list": {
+    "url": "/client/campaigns/",
+    "file": "snapshots/client_campaign_list.html"
+  },
+  "client_deliverables": {
+    "url": "/client/deliverables/",
+    "file": "snapshots/client_deliverables.html"
+  },
+  "client_reports": {
+    "url": "/client/reports/",
+    "file": "snapshots/client_reports.html"
+  },
+  "client_campaign_detail": {
+    "url": "/client/campaigns/1/",
+    "file": "snapshots/client_campaign_detail.html"
+  },
+  "administrator_employee_list": {
+    "url": "/administrator/employees/",
+    "file": "snapshots/administrator_employee_list.html"
+  },
+  "administrator_employee_edit": {
+    "url": "/administrator/employees/1/edit/",
+    "file": "snapshots/administrator_employee_edit.html"
+  },
+  "employee_profile": {
+    "url": "/employee/profile/",
+    "file": "snapshots/employee_profile.html"
+  },
+  "employee_deliverable_campaigns_empty": {
+    "url": "/employee/deliverables/",
+    "file": "snapshots/employee_deliverable_campaigns_empty.html"
+  }
+}

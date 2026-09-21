@@ -1,0 +1,94 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Post Enhancement Rehearsal | Campaign Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/campaigns/css/home.css">
+    
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+        <div class="container py-2">
+            <a class="navbar-brand fw-bold" href="/">Campaign Planner</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="mainNavigation">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    
+                        
+                            <li class="nav-item"><a class="nav-link" href="/administrator/dashboard/">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/administrator/dashboard/#campaigns">Campaigns</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/administrator/employees/">Employees</a></li>
+                        
+                        <li class="nav-item"><form method="post" action="/client/logout/"><input type="hidden" name="csrfmiddlewaretoken" value="zOFYRRwpZaT0K95GXdi9QpgiGR0OWIFiWg6agrMCzH6cggp2MNxt7tcOLDwjgvHJ"><button class="btn btn-outline-light btn-sm" type="submit">Log out</button></form></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+<main class="py-5">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+            <a class="btn btn-link px-0" href="/administrator/dashboard/">&larr; Back to dashboard</a>
+            <a class="btn btn-outline-primary" href="/administrator/campaigns/1/report/">View Report</a>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm"><div class="card-body p-4 p-lg-5">
+                    <div class="d-flex flex-wrap justify-content-between gap-3 mb-4"><div><p class="text-secondary mb-1">Campaign request</p><h1 class="h2 fw-bold mb-0">Post Enhancement Rehearsal</h1></div><span class="badge text-bg-info fs-6 align-self-start">In Progress</span>
+</div>
+                    <h2 class="h6 text-uppercase text-secondary">Description</h2><p class="mb-4">Launch a local product with connected campaign records.</p>
+                    <h2 class="h6 text-uppercase text-secondary">Platforms</h2>
+<p class="mb-4 text-break">Instagram, Facebook, YouTube</p>
+<h2 class="h6 text-uppercase text-secondary">Campaign Goal</h2>
+<p class="mb-4 text-break">Build launch awareness.<br>Generate 25 product enquiries.</p>
+
+                    <div class="row g-4">
+                        <div class="col-md-6"><h2 class="h6 text-uppercase text-secondary">Client</h2><p class="mb-0">Rehearsal Client</p><p class="text-secondary">rehearsalclient@example.com</p></div>
+                        <div class="col-md-6"><h2 class="h6 text-uppercase text-secondary">Target audience</h2><p>Local shoppers</p></div>
+                        <div class="col-md-4"><h2 class="h6 text-uppercase text-secondary">Budget</h2><p>5000.00</p></div>
+                        <div class="col-md-4"><h2 class="h6 text-uppercase text-secondary">Start date</h2><p>Oct 1, 2026</p></div>
+                        <div class="col-md-4"><h2 class="h6 text-uppercase text-secondary">End date</h2><p>Oct 31, 2026</p></div>
+                    </div>
+                    <h2 class="h6 text-uppercase text-secondary mt-3">Campaign type</h2><p>Social Media</p>
+                    <p class="mb-2"><strong>Campaign progress:</strong> 65%</p>
+                    <div class="progress" role="progressbar" aria-label="Campaign progress" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:65%"></div></div>
+                    <hr><small class="text-secondary">Submitted Sep 15, 2026, 2:11 p.m.</small>
+                </div></div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4"><div class="card-body p-4"><h2 class="h5 fw-bold mb-3">Assigned employee</h2><p>Rehearsal Employee</p><p class="text-secondary small">Campaigns can be assigned after approval and while in progress. Updating the assignment also transfers campaign tasks to the selected employee. Clearing it unassigns those tasks.</p><form method="post"><input type="hidden" name="csrfmiddlewaretoken" value="zOFYRRwpZaT0K95GXdi9QpgiGR0OWIFiWg6agrMCzH6cggp2MNxt7tcOLDwjgvHJ"><select name="assignment-assigned_employee" class="form-select" id="id_assignment-assigned_employee">
+  <option value="">---------</option>
+
+  <option value="1" selected>Rehearsal Employee</option>
+
+</select><button class="btn btn-primary w-100 mt-3" name="update_assignment" type="submit">Update assignment</button></form></div></div>
+                <div class="card border-0 shadow-sm mb-4"><div class="card-body p-4"><h2 class="h5 fw-bold mb-3">Change status</h2><form method="post"><input type="hidden" name="csrfmiddlewaretoken" value="zOFYRRwpZaT0K95GXdi9QpgiGR0OWIFiWg6agrMCzH6cggp2MNxt7tcOLDwjgvHJ"><select name="status-status" class="form-select" id="id_status-status">
+  <option value="pending">Pending</option>
+
+  <option value="approved">Approved</option>
+
+  <option value="rejected">Rejected</option>
+
+  <option value="in_progress" selected>In Progress</option>
+
+  <option value="completed">Completed</option>
+
+</select><button class="btn btn-primary w-100 mt-3" name="update_status" type="submit">Update status</button></form></div></div>
+                
+            </div>
+        </div>
+        <div class="card border-0 shadow-sm mt-4"><div class="card-header bg-white py-3"><div class="d-flex flex-wrap justify-content-between align-items-center gap-3"><h2 class="h5 fw-bold mb-0">Campaign Tasks</h2><a class="btn btn-sm btn-primary" href="/administrator/campaigns/1/tasks/create/">Add Task</a></div></div><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Task</th><th>Assigned employee</th><th>Due date</th><th>Status</th></tr></thead><tbody><tr><td><p class="fw-semibold mb-1">Prepare launch content</p><p class="text-secondary small mb-0">Create the final creative for this campaign.</p></td><td>Rehearsal Employee</td><td>Oct 15, 2026</td><td><span class="badge text-bg-success align-self-start">Completed</span>
+</td></tr></tbody></table></div></div>
+    </div>
+</main>
+
+    <footer class="py-4 text-center text-secondary"><div class="container">Digital Marketing Campaign Planner</div></footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

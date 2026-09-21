@@ -3,7 +3,7 @@
 {% block content %}
 <main>
     <section class="dashboard-header text-white py-5">
-        <div class="container py-3"><span class="badge rounded-pill mb-3">Administrator Workspace</span><div class="d-flex flex-wrap justify-content-between align-items-end gap-3"><div><h1 class="display-6 fw-bold">Campaign Management</h1><p class="lead mb-0">Review and manage all submitted campaign requests.</p></div><a class="btn btn-light" href="{% url 'administrator_employee_list' %}">Manage employees</a></div></div>
+        <div class="container py-3"><span class="badge rounded-pill mb-3">Administrator Workspace</span><div class="d-flex flex-wrap justify-content-between align-items-end gap-3"><div><h1 class="display-6 fw-bold">Campaign Management</h1><p class="lead mb-0">Review and manage all submitted campaign requests.</p></div><div class="d-flex flex-wrap gap-2"><a class="btn btn-light" href="{% url 'administrator_client_create' %}">Add Client</a><a class="btn btn-light" href="{% url 'administrator_employee_list' %}">Manage employees</a></div></div></div>
     </section>
     <section class="py-5">
         <div class="container">
@@ -23,7 +23,7 @@
                         <thead class="table-light"><tr><th>Campaign</th><th>Client</th><th>Assigned employee</th><th>Progress</th><th>Status</th><th class="text-end">Action</th></tr></thead>
                         <tbody>
                             {% for campaign in campaigns %}
-                                <tr><td class="fw-semibold">{{ campaign.name }}</td><td>{{ campaign.client.get_full_name|default:campaign.client.username }}<br><small class="text-secondary">{{ campaign.client.email }}</small></td><td>{{ campaign.assigned_employee|default:"Unassigned" }}</td><td>{{ campaign.progress_percentage }}%</td><td>{% include 'campaigns/includes/status_badge.html' with status=campaign.status label=campaign.get_status_display extra_classes="align-self-start" only %}</td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'administrator_campaign_detail' campaign.id %}">View details</a></td></tr>
+                                <tr><td class="fw-semibold">{{ campaign.name }}{% if campaign.is_archived %} <span class="badge text-bg-secondary">Archived</span>{% endif %}</td><td>{{ campaign.client.get_full_name|default:campaign.client.username }}<br><small class="text-secondary">{{ campaign.client.email }}</small></td><td>{{ campaign.assigned_employee|default:"Unassigned" }}</td><td>{{ campaign.progress_percentage }}%</td><td>{% include 'campaigns/includes/status_badge.html' with status=campaign.status label=campaign.get_status_display extra_classes="align-self-start" only %}</td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'administrator_campaign_detail' campaign.id %}">View details</a></td></tr>
                             {% empty %}
                                 <tr><td class="text-center text-secondary py-5" colspan="6">No campaign requests have been submitted yet.</td></tr>
                             {% endfor %}

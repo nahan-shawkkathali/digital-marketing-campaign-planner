@@ -1,0 +1,50 @@
+{% extends 'campaigns/base.html' %}
+{% block title %}{{ campaign.name }} | Client Campaign{% endblock %}
+{% block content %}
+<main class="py-5"><div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+        <a class="btn btn-link px-0" href="{% url 'client_campaign_list' %}">&larr; Back to Campaigns</a>
+        <a class="btn btn-outline-primary" href="{% url 'client_campaign_report' campaign.id %}">View Campaign Report</a>
+    </div>
+    {% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}
+    <div class="card border-0 shadow-sm"><div class="card-body p-4 p-lg-5">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+            <div><p class="text-secondary mb-1">Campaign</p><h1 class="h2 fw-bold mb-0">{{ campaign.name }}</h1></div>
+            {% include 'campaigns/includes/status_badge.html' with status=campaign.status label=campaign.get_status_display extra_classes="fs-6 align-self-start" only %}
+        </div>
+        <h2 class="h6 text-uppercase text-secondary">Description</h2><p class="mb-4">{{ campaign.description|linebreaksbr }}</p>
+        {% include 'campaigns/includes/campaign_requirements.html' with campaign=campaign only %}
+        <div class="row g-4">
+            <div class="col-md-4"><h2 class="h6 text-uppercase text-secondary">Campaign type</h2><p>{{ campaign.campaign_type|default:"Not specified" }}</p></div>
+            <div class="col-md-4"><h2 class="h6 text-uppercase text-secondary">Budget</h2><p>{{ campaign.budget|default_if_none:"Not specified" }}</p></div>
+            <div class="col-md-4"><h2 class="h6 text-uppercase text-secondary">Assigned employee</h2><p>{{ campaign.assigned_employee|default:"Not assigned" }}</p></div>
+            <div class="col-md-4"><h2 class="h6 text-uppercase text-secondary">Start date</h2><p>{{ campaign.start_date|date:"M j, Y"|default:"Not specified" }}</p></div>
+            <div class="col-md-4"><h2 class="h6 text-uppercase text-secondary">End date</h2><p>{{ campaign.end_date|date:"M j, Y"|default:"Not specified" }}</p></div>
+            <div class="col-md-4"><h2 class="h6 text-uppercase text-secondary">Progress</h2><p>{{ campaign.progress_percentage }}%</p></div>
+        </div>
+        <div class="progress mt-2" role="progressbar" aria-label="Campaign progress" aria-valuenow="{{ campaign.progress_percentage }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:{{ campaign.progress_percentage }}%">{{ campaign.progress_percentage }}%</div></div>
+        <p class="text-secondary mt-3 mb-0"><strong>Tasks Completed:</strong> {{ completed_tasks }} / {{ total_tasks }}</p>
+    </div></div>
+
+    <div class="card border-0 shadow-sm mt-4"><div class="card-body p-4 p-lg-5">
+        <h2 class="h4 fw-bold mb-4">Deliverables</h2>
+        <div class="list-group list-group-flush">
+            {% for deliverable in deliverables %}
+                <div class="list-group-item px-0 py-3"><div class="d-flex flex-wrap justify-content-between gap-3">
+                    <div><h3 class="h6 fw-bold mb-1">{{ deliverable.title }}</h3><p class="text-secondary mb-2">{{ deliverable.description|default:"No description" }}</p><small>Uploaded {{ deliverable.uploaded_at|date:"M j, Y, P" }} by {{ deliverable.uploaded_by }}</small></div>
+                    <div class="text-end">
+                        {% include 'campaigns/includes/status_badge.html' with status=deliverable.approval_status label=deliverable.get_approval_status_display extra_classes="align-self-start" only %}<br>
+                        {% if deliverable.uploaded_file %}<a class="btn btn-sm btn-outline-primary mt-2" href="{{ deliverable.uploaded_file.url }}" target="_blank" rel="noopener noreferrer">Open file</a>{% else %}<span class="text-secondary">No file available</span>{% endif %}
+                        {% if deliverable.approval_status == 'pending' %}
+                            <div class="d-flex gap-2 mt-2">
+                                <form method="post" action="{% url 'client_deliverable_decision' campaign.id deliverable.id 'approve' %}">{% csrf_token %}<button class="btn btn-sm btn-success" type="submit">Approve</button></form>
+                                <form method="post" action="{% url 'client_deliverable_decision' campaign.id deliverable.id 'reject' %}">{% csrf_token %}<button class="btn btn-sm btn-outline-danger" type="submit">Reject</button></form>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div></div>
+            {% empty %}<p class="text-secondary mb-0">No deliverables have been uploaded for this campaign.</p>{% endfor %}
+        </div>
+    </div></div>
+</div></main>
+{% endblock %}

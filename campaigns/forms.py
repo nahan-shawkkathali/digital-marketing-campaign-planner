@@ -1,8 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
+from django.db import transaction
 
-from .models import Campaign, Deliverable, EmployeeProfile, Task
+from .models import Campaign, ClientProfile, Deliverable, DeliverableMessage, EmployeeProfile, Task
 
 
 class BootstrapFormMixin:
@@ -13,10 +14,11 @@ class BootstrapFormMixin:
 
 class ClientRegistrationForm(BootstrapFormMixin, UserCreationForm):
     email = forms.EmailField(required=True)
+    company_name = forms.CharField(label="Company / Business Name", max_length=255, required=False)
 
     class Meta:
         model = User
-        fields = ("username", "email", "password1", "password2")
+        fields = ("username", "first_name", "last_name", "email", "company_name", "password1", "password2")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -28,6 +30,18 @@ class ClientRegistrationForm(BootstrapFormMixin, UserCreationForm):
             raise forms.ValidationError("An account with this email already exists.")
         return email
 
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        if commit:
+            with transaction.atomic():
+                user.save()
+                if self.cleaned_data["company_name"]:
+                    ClientProfile.objects.update_or_create(
+                        user=user,
+                        defaults={"company_name": self.cleaned_data["company_name"]},
+                    )
+        return user
+
 
 class ClientLoginForm(BootstrapFormMixin, AuthenticationForm):
     def __init__(self, request=None, *args, **kwargs):
@@ -37,13 +51,16 @@ class ClientLoginForm(BootstrapFormMixin, AuthenticationForm):
 
 class ClientProfileForm(BootstrapFormMixin, forms.ModelForm):
     email = forms.EmailField(required=True)
+    company_name = forms.CharField(label="Company / Business Name", max_length=255, required=False)
 
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "email")
+        fields = ("first_name", "last_name", "email", "company_name")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        profile = getattr(self.instance, "client_profile", None) if self.instance.pk else None
+        self.initial.setdefault("company_name", profile.company_name if profile else "")
         self.apply_bootstrap_styles()
 
     def clean_email(self):
@@ -51,6 +68,17 @@ class ClientProfileForm(BootstrapFormMixin, forms.ModelForm):
         if User.objects.filter(email__iexact=email).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError("An account with this email already exists.")
         return email
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        if commit:
+            with transaction.atomic():
+                user.save()
+                ClientProfile.objects.update_or_create(
+                    user=user,
+                    defaults={"company_name": self.cleaned_data["company_name"]},
+                )
+        return user
 
 
 class AdministratorLoginForm(ClientLoginForm):
@@ -69,6 +97,11 @@ class CampaignStatusForm(forms.ModelForm):
         fields = ("status",)
         widgets = {"status": forms.Select(attrs={"class": "form-select"})}
 
+    def clean_status(self):
+        if self.instance.is_archived:
+            raise forms.ValidationError("Archived campaigns cannot be updated.")
+        return self.cleaned_data["status"]
+
     def save(self, commit=True):
         campaign = super().save(commit=False)
         if campaign.status == Campaign.Status.COMPLETED:
@@ -85,6 +118,7 @@ class CampaignRequestForm(BootstrapFormMixin, forms.ModelForm):
             "name",
             "description",
             "campaign_type",
+            "product_service_name",
             "target_audience",
             "budget",
             "start_date",
@@ -233,6 +267,8 @@ class CampaignAssignmentForm(forms.ModelForm):
 
     def clean_assigned_employee(self):
         employee = self.cleaned_data["assigned_employee"]
+        if self.instance.is_archived:
+            raise forms.ValidationError("Archived campaigns cannot be assigned.")
         if employee and self.instance.status not in (Campaign.Status.APPROVED, Campaign.Status.IN_PROGRESS):
             raise forms.ValidationError("Only approved campaigns can be assigned.")
         return employee
@@ -257,6 +293,8 @@ class EmployeeCampaignProgressForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        if self.instance.is_archived:
+            raise forms.ValidationError("Archived campaigns cannot be updated.")
         if self.instance.status in (Campaign.Status.PENDING, Campaign.Status.REJECTED):
             raise forms.ValidationError("This campaign must be approved before work can be updated.")
         if cleaned_data.get("status") == Campaign.Status.COMPLETED and "progress_percentage" in cleaned_data:
@@ -280,6 +318,24 @@ class DeliverableUploadForm(BootstrapFormMixin, forms.ModelForm):
         self.apply_bootstrap_styles()
 
 
+class DeliverableMessageForm(BootstrapFormMixin, forms.ModelForm):
+    body = forms.CharField(label="Message", max_length=5000, widget=forms.Textarea(attrs={"rows": 3}))
+
+    class Meta:
+        model = DeliverableMessage
+        fields = ("body",)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_bootstrap_styles()
+
+
+class RevisionRequestForm(DeliverableMessageForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["body"].label = "Revision comment"
+
+
 class AdministratorTaskForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = Task
@@ -291,6 +347,7 @@ class AdministratorTaskForm(BootstrapFormMixin, forms.ModelForm):
 
     def __init__(self, *args, campaign, **kwargs):
         super().__init__(*args, **kwargs)
+        self.campaign = campaign
         employees = EmployeeProfile.objects.filter(
             user__is_active=True, pk=campaign.assigned_employee_id,
         )
@@ -300,6 +357,8 @@ class AdministratorTaskForm(BootstrapFormMixin, forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        if self.campaign.is_archived:
+            raise forms.ValidationError("Archived campaigns cannot have new work assigned.")
         if not self.fields["assigned_employee"].queryset.exists():
             raise forms.ValidationError("Assign an active employee to this campaign before creating tasks.")
         return cleaned_data

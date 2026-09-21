@@ -117,7 +117,7 @@ class ClientModuleUXTests(AuditFixtures):
         self.assertContains(response, '<span class="badge text-bg-success">Approved</span>', html=True)
         self.assertContains(response, '<span class="badge text-bg-danger ">Rejected</span>', html=True)
         parsed = PageMarkup(response.content.decode())
-        for decision in ("approve", "reject"):
+        for decision in ("approve", "request_changes"):
             form = next(form for form in parsed.forms if form["action"] == self.decision_url(decision))
             self.assertEqual(form["method"], "post")
             self.assertTrue(form["csrf"])

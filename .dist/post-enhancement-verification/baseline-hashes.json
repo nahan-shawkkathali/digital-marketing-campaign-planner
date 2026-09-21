@@ -1,0 +1,46 @@
+[
+    {
+        "Path":  "C:\\Users\\nahan\\Desktop\\digital_marketing_planner\\db.sqlite3",
+        "Hash":  "EEC0313AD33C08E2E3F0C282C1CD224781EAA57037335EC7E8106A87A64B3451"
+    },
+    {
+        "Path":  "C:\\Users\\nahan\\Desktop\\digital_marketing_planner\\media\\deliverables\\2026\\09\\01\\Screenshot_2024-10-24_125502.png",
+        "Hash":  "70173D4AB84DA87D66239724DBC037484A6A788C57E7676E22D6CC945905F0DA"
+    },
+    {
+        "Path":  "C:\\Users\\nahan\\Desktop\\digital_marketing_planner\\media\\deliverables\\2026\\09\\02\\Screenshot_2025-03-05_194224.png",
+        "Hash":  "555C962EED63FADE4386876E261C8B185026DA809E697E7FD558BC87B2E6438D"
+    },
+    {
+        "Path":  "C:\\Users\\nahan\\Desktop\\digital_marketing_planner\\campaigns\\migrations\\0001_initial.py",
+        "Hash":  "5A313B0976F740F76E42347FFCED5336425FAA4C07CBF2FC9F7FAE397E4BCCD9"
+    },
+    {
+        "Path":  "C:\\Users\\nahan\\Desktop\\digital_marketing_planner\\campaigns\\migrations\\0002_campaign_progress_percentage_employeeprofile_and_more.py",
+        "Hash":  "E3CB006FD6EAD456CEEE64995A0D2B2229D2607FEDF22D5C1A62EE0772B5F861"
+    },
+    {
+        "Path":  "C:\\Users\\nahan\\Desktop\\digital_marketing_planner\\campaigns\\migrations\\0003_deliverable.py",
+        "Hash":  "752A94058D61B67BC253D40FD303DA864F0D4D99D89BAAB6BE05665EAF214E85"
+    },
+    {
+        "Path":  "C:\\Users\\nahan\\Desktop\\digital_marketing_planner\\campaigns\\migrations\\0004_auto_20260901_2048.py",
+        "Hash":  "06E6229E815CA211B94ABA5294E41574FA0E01B3E43F07F29B4A9BD5C6586F83"
+    },
+    {
+        "Path":  "C:\\Users\\nahan\\Desktop\\digital_marketing_planner\\campaigns\\migrations\\0005_campaign_campaign_type.py",
+        "Hash":  "6BE28AE87BADAA88DBD732A1D39DC78FD4B4005BE94F739DEE01E6917B97C519"
+    },
+    {
+        "Path":  "C:\\Users\\nahan\\Desktop\\digital_marketing_planner\\campaigns\\migrations\\0006_task.py",
+        "Hash":  "E6F29B1F7FC00B5DFD91E7AF6D2DF72A28C609F1E86EA2A4F550D9160F4368C0"
+    },
+    {
+        "Path":  "C:\\Users\\nahan\\Desktop\\digital_marketing_planner\\campaigns\\migrations\\0007_campaign_campaign_goal_campaign_platforms.py",
+        "Hash":  "1142D75A82D9F08FE0473409041577C128C2DE4B6E60ABD05F2DDE611ADE31DF"
+    },
+    {
+        "Path":  "C:\\Users\\nahan\\Desktop\\digital_marketing_planner\\campaigns\\migrations\\__init__.py",
+        "Hash":  "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    }
+]

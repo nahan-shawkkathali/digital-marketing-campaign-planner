@@ -25,27 +25,19 @@ body {
     min-height: 50vh;
 }
 
-.hero-section .badge {
-    background: rgba(255, 255, 255, 0.14);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+.hero-section .hero-tagline {
     color: #ffffff;
     font-size: 0.9rem;
+    font-weight: 600;
     letter-spacing: 0.04em;
-    padding: 0.65rem 1rem;
 }
 
 .hero-section .lead {
     color: rgba(255, 255, 255, 0.82);
 }
 
-.role-card {
-    border-radius: 1rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.role-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 1rem 2rem rgba(16, 42, 67, 0.12) !important;
+.hero-section h1 {
+    font-size: clamp(2rem, 3vw, 2.5rem);
 }
 
 .role-icon {
@@ -67,6 +59,73 @@ body {
     border-radius: 0.65rem;
     font-weight: 600;
     padding: 0.7rem 1rem;
+}
+
+.roles-section .role-card-client {
+    --role-color: #2563eb;
+    --role-hover: #1d4ed8;
+    --role-focus-rgb: 37, 99, 235;
+}
+
+.roles-section .role-card-administrator {
+    --role-color: #15803d;
+    --role-hover: #166534;
+    --role-focus-rgb: 21, 128, 61;
+}
+
+.roles-section .role-card-employee {
+    --role-color: #7c3aed;
+    --role-hover: #6d28d9;
+    --role-focus-rgb: 124, 58, 237;
+}
+
+.roles-section .role-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+}
+
+.roles-section .card-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.roles-section .role-actions {
+    margin-top: auto;
+}
+
+.roles-section .role-icon {
+    background: transparent;
+    border-radius: 0;
+    color: var(--role-color);
+    flex-shrink: 0;
+    height: 1.75rem;
+    width: 1.75rem;
+}
+
+.roles-section .role-icon svg {
+    height: 100%;
+    width: 100%;
+}
+
+.roles-section .btn-primary {
+    --bs-btn-hover-bg: var(--role-hover);
+    --bs-btn-hover-border-color: var(--role-hover);
+    --bs-btn-active-bg: var(--role-hover);
+    --bs-btn-active-border-color: var(--role-hover);
+    --bs-btn-focus-shadow-rgb: var(--role-focus-rgb);
+    background: var(--role-color);
+    border-color: var(--role-color);
+    border-radius: 0.5rem;
+    color: #ffffff;
+    padding: 0.625rem 1rem;
+}
+
+.roles-section .btn-primary:hover,
+.roles-section .btn-primary:focus-visible,
+.roles-section .btn-primary:active {
+    background: var(--role-hover);
+    border-color: var(--role-hover);
 }
 
 footer {

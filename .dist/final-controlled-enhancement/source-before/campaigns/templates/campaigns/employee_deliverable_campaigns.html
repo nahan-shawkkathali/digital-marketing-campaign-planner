@@ -1,0 +1,32 @@
+{% extends 'campaigns/base.html' %}
+{% block title %}Choose Campaign to Upload Deliverable | Campaign Planner{% endblock %}
+{% block content %}
+<main class="py-5">
+    <div class="container">
+        <a class="btn btn-link px-0" href="{% url 'employee_dashboard' %}">&larr; Back to dashboard</a>
+        <h1 class="h2 fw-bold">Choose Campaign to Upload Deliverable</h1>
+        <p class="text-secondary mb-4">Choose an assigned campaign to upload your work. Approved, in-progress, and completed campaigns are available.</p>
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light"><tr><th scope="col">Campaign</th><th scope="col">Client</th><th scope="col">Deadline</th><th scope="col">Status</th><th scope="col">Progress</th><th scope="col" class="text-end">Action</th></tr></thead>
+                    <tbody>
+                        {% for campaign in campaigns %}
+                            <tr>
+                                <th scope="row" class="fw-semibold text-break">{{ campaign.name }}</th>
+                                <td>{{ campaign.client.get_full_name|default:campaign.client.username }}</td>
+                                <td>{{ campaign.end_date|date:"M j, Y"|default:"Not specified" }}</td>
+                                <td>{% include 'campaigns/includes/status_badge.html' with status=campaign.status label=campaign.get_status_display only %}</td>
+                                <td>{{ campaign.progress_percentage }}%</td>
+                                <td class="text-end"><a class="btn btn-sm btn-outline-primary text-nowrap" href="{% url 'employee_deliverable_upload' campaign.id %}" aria-label="Upload deliverable for {{ campaign.name }}">Upload Deliverable</a></td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="6" class="text-center text-secondary py-5">No campaigns are currently available for deliverable upload.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

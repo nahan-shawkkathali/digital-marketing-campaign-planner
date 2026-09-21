@@ -2,11 +2,11 @@
 {% block content %}
 <main>
         <section class="hero-section text-white">
-            <div class="container py-5">
-                <div class="row align-items-center min-vh-50 py-5">
-                    <div class="col-lg-8 mx-auto text-center">
-                        <span class="badge rounded-pill mb-3">Plan. Collaborate. Grow.</span>
-                        <h1 class="display-4 fw-bold mb-4">Digital Marketing Campaign Planner</h1>
+            <div class="container py-3">
+                <div class="row align-items-center">
+                    <div class="col-lg-12 mx-auto text-center">
+                        <p class="hero-tagline mb-2">Plan. Collaborate. Grow.</p>
+                        <h1 class="display-4 fw-bold mb-3">Digital Marketing Campaign Planner</h1>
                         <p class="lead mb-0">
                             Organize client campaigns, coordinate marketing work, and keep every campaign goal in one clear, simple workspace.
                         </p>
@@ -15,53 +15,73 @@
             </div>
         </section>
 
-        <section id="roles" class="roles-section py-5">
-            <div class="container py-4">
-                <div class="text-center mb-5">
-                    <h2 class="fw-bold">Choose your role</h2>
+        <section id="roles" class="roles-section py-4">
+            <div class="container">
+                <div class="text-center mb-3">
+                    <h2 class="h3 fw-bold">Choose your role</h2>
                     <p class="text-secondary mb-0">Choose the workspace that matches your role.</p>
                 </div>
                 <div class="row g-4 justify-content-center">
                     <div class="col-md-6 col-lg-4">
-                        <div class="role-card card h-100 border-0 shadow-sm text-center">
-                            <div class="card-body p-4 p-xl-5">
-                                <div class="role-icon mx-auto mb-4">C</div>
-                                <h3 class="h4 fw-bold">Client</h3>
+                        <div class="role-card role-card-client card h-100 shadow-sm text-center">
+                            <div class="card-body p-4">
+                                <div class="role-icon mx-auto mb-3">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                        <circle cx="12" cy="8" r="4" />
+                                        <path d="M5 21v-2a7 7 0 0 1 14 0v2" />
+                                    </svg>
+                                </div>
+                                <h3 class="h5 fw-bold">Client</h3>
                                 <p class="text-secondary">Review campaign plans, goals, and progress from one convenient place.</p>
-                                {% if user.is_authenticated and not user.is_staff and not user.is_superuser and not user.employee_profile %}
-                                    <a class="btn btn-primary w-100" href="{% url 'client_dashboard' %}">Open Client Dashboard</a>
-                                {% else %}
-                                    <a class="btn btn-primary w-100 mb-2" href="{% url 'login' %}">Client Login</a>
-                                    <a class="btn btn-outline-primary w-100" href="{% url 'register' %}">Create Client Account</a>
-                                {% endif %}
+                                <div class="role-actions">
+                                    {% if user.is_authenticated and not user.is_staff and not user.is_superuser and not user.employee_profile %}
+                                        <a class="btn btn-primary w-100" href="{% url 'client_dashboard' %}">Open Client Dashboard</a>
+                                    {% else %}
+                                        <a class="btn btn-primary w-100" href="{% url 'login' %}">Client Login</a>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6 col-lg-4">
-                        <div class="role-card card h-100 border-0 shadow-sm text-center">
-                            <div class="card-body p-4 p-xl-5">
-                                <div class="role-icon mx-auto mb-4">M</div>
-                                <h3 class="h4 fw-bold">Marketing Employee</h3>
-                                <p class="text-secondary">Plan campaign activities and keep marketing work organized.</p>
-                                {% if user.is_authenticated and user.employee_profile %}
-                                    <a class="btn btn-primary w-100" href="{% url 'employee_dashboard' %}">Open Employee Dashboard</a>
-                                {% else %}
-                                    <a class="btn btn-primary w-100" href="{% url 'employee_login' %}">Employee Login</a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-4">
-                        <div class="role-card card h-100 border-0 shadow-sm text-center">
-                            <div class="card-body p-4 p-xl-5">
-                                <div class="role-icon mx-auto mb-4">A</div>
-                                <h3 class="h4 fw-bold">Administrator</h3>
+                        <div class="role-card role-card-administrator card h-100 shadow-sm text-center">
+                            <div class="card-body p-4">
+                                <div class="role-icon mx-auto mb-3">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                        <path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3Z" />
+                                        <path d="m8 12 3 3 5-6" />
+                                    </svg>
+                                </div>
+                                <h3 class="h5 fw-bold">Administrator</h3>
                                 <p class="text-secondary">Oversee users, campaigns, and the overall planning system.</p>
-                                {% if user.is_staff or user.is_superuser %}
-                                    <a class="btn btn-primary w-100" href="{% url 'administrator_dashboard' %}">Open Administrator Dashboard</a>
-                                {% else %}
-                                    <a class="btn btn-primary w-100" href="{% url 'administrator_login' %}">Administrator Login</a>
-                                {% endif %}
+                                <div class="role-actions">
+                                    {% if user.is_staff or user.is_superuser %}
+                                        <a class="btn btn-primary w-100" href="{% url 'administrator_dashboard' %}">Open Administrator Dashboard</a>
+                                    {% else %}
+                                        <a class="btn btn-primary w-100" href="{% url 'administrator_login' %}">Administrator Login</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="role-card role-card-employee card h-100 shadow-sm text-center">
+                            <div class="card-body p-4">
+                                <div class="role-icon mx-auto mb-3">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                        <circle cx="9" cy="8" r="4" />
+                                        <path d="M2 21v-2a7 7 0 0 1 14 0v2M16 4a4 4 0 0 1 0 8M22 21v-2a7 7 0 0 0-4-6.33" />
+                                    </svg>
+                                </div>
+                                <h3 class="h5 fw-bold">Marketing Employee</h3>
+                                <p class="text-secondary">Plan campaign activities and keep marketing work organized.</p>
+                                <div class="role-actions">
+                                    {% if user.is_authenticated and user.employee_profile %}
+                                        <a class="btn btn-primary w-100" href="{% url 'employee_dashboard' %}">Open Employee Dashboard</a>
+                                    {% else %}
+                                        <a class="btn btn-primary w-100" href="{% url 'employee_login' %}">Employee Login</a>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>

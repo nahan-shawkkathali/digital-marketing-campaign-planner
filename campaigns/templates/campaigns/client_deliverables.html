@@ -5,7 +5,7 @@
     <div class="container">
         <a class="btn btn-link px-0" href="{% url 'client_dashboard' %}">&larr; Back to dashboard</a>
         <h1 class="h2 fw-bold">Review Deliverables</h1>
-        <p class="text-secondary mb-4">Review files uploaded for your campaigns and approve or reject pending work.</p>
+        <p class="text-secondary mb-4">Review files uploaded for your campaigns and approve pending work or request changes.</p>
         {% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}" role="status">{{ message }}</div>{% endfor %}
 
         <ul class="nav nav-pills flex-wrap gap-2 mb-4" aria-label="Filter deliverables by approval status">
@@ -28,22 +28,8 @@
                                 <td>{% if deliverable.approval_status == 'approved' %}<span class="badge text-bg-success">Approved</span>{% else %}{% include 'campaigns/includes/status_badge.html' with status=deliverable.approval_status label=deliverable.get_approval_status_display only %}{% endif %}</td>
                                 <td>{% if deliverable.uploaded_file %}<a class="btn btn-sm btn-outline-primary text-nowrap" href="{{ deliverable.uploaded_file.url }}" target="_blank" rel="noopener noreferrer" aria-label="Open file: {{ deliverable.title }}">Open File</a>{% else %}<span class="text-secondary">No file available</span>{% endif %}</td>
                                 <td>
-                                    {% if deliverable.approval_status == 'pending' %}
-                                        <div class="d-flex flex-wrap gap-2">
-                                            <form method="post" action="{% url 'client_deliverable_decision' deliverable.campaign_id deliverable.id 'approve' %}">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="return_to" value="deliverables">
-                                                <input type="hidden" name="status" value="{{ selected_status }}">
-                                                <button class="btn btn-sm btn-success" type="submit" aria-label="Approve {{ deliverable.title }}">Approve</button>
-                                            </form>
-                                            <form method="post" action="{% url 'client_deliverable_decision' deliverable.campaign_id deliverable.id 'reject' %}">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="return_to" value="deliverables">
-                                                <input type="hidden" name="status" value="{{ selected_status }}">
-                                                <button class="btn btn-sm btn-outline-danger" type="submit" aria-label="Reject {{ deliverable.title }}">Reject</button>
-                                            </form>
-                                        </div>
-                                    {% else %}<span class="text-secondary small">Reviewed</span>{% endif %}
+                                    <p class="small text-secondary mb-1">Version {{ deliverable.version }} &middot; {% if deliverable.is_current %}Current{% else %}Historical{% endif %}</p><a class="btn btn-sm btn-outline-secondary mt-2" href="{% url 'deliverable_discussion' deliverable.campaign_id deliverable.id %}">Discussion / Versions</a>
+                                    {% include 'campaigns/includes/deliverable_review_actions.html' with deliverable=deliverable return_to='deliverables' selected_status=selected_status %}
                                 </td>
                             </tr>
                         {% empty %}

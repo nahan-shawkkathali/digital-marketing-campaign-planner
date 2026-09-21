@@ -1,0 +1,16 @@
+{% extends 'campaigns/base.html' %}
+{% block title %}Archive Campaign | Campaign Planner{% endblock %}
+{% block content %}
+<main class="py-5"><div class="container"><div class="row justify-content-center"><div class="col-lg-7">
+    <div class="card border-0 shadow-sm"><div class="card-body p-4 p-lg-5">
+        <h1 class="h3 fw-bold">Archive Campaign</h1>
+        <p class="fw-semibold text-break">{{ campaign.name }}</p>
+        <p>This campaign will be removed from active employee work and locked for updates. Its {{ task_count }} task{{ task_count|pluralize }}, {{ deliverable_count }} deliverable{{ deliverable_count|pluralize }}, uploaded files and reports will remain available in history.</p>
+        {% if confirmation_error %}<div class="alert alert-danger">Please confirm the archive action.</div>{% endif %}
+        <form method="post">{% csrf_token %}
+            <button class="btn btn-warning" type="submit" name="confirm" value="yes">Confirm Archive</button>
+            <a class="btn btn-outline-secondary" href="{% url 'administrator_campaign_detail' campaign.id %}">Cancel</a>
+        </form>
+    </div></div>
+</div></div></div></main>
+{% endblock %}

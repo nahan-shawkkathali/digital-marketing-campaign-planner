@@ -1,6 +1,7 @@
 {% extends 'campaigns/base.html' %}
 {% block title %}{{ campaign.name }} | Employee Dashboard{% endblock %}
 {% block content %}
+{% if campaign.is_archived %}<div class="container mt-4"><div class="alert alert-secondary">Archived campaign ? available for historical reference.</div></div>{% endif %}
 <main class="py-5"><div class="container">
     <a class="btn btn-link px-0 mb-3" href="{% url 'employee_dashboard' %}">&larr; Back to dashboard</a>
     {% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}
@@ -10,7 +11,7 @@
                 <p class="text-secondary mb-1">Assigned campaign</p>
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
                     <h1 class="h2 fw-bold mb-0">{{ campaign.name }}</h1>
-                    <a class="btn btn-primary" href="{% url 'employee_deliverable_upload' campaign.id %}">Upload Deliverable</a>
+                    {% if not campaign.is_archived %}<a class="btn btn-primary" href="{% url 'employee_deliverable_upload' campaign.id %}">Upload Deliverable</a>{% endif %}
                 </div>
                 <div class="mb-4">{% include 'campaigns/includes/status_badge.html' with status=campaign.status label=campaign.get_status_display only %}</div>
                 <h2 class="h6 text-uppercase text-secondary">Description</h2><p class="mb-4">{{ campaign.description|linebreaksbr }}</p>
@@ -31,8 +32,8 @@
                 <div class="list-group list-group-flush">
                     {% for deliverable in deliverables %}
                         <div class="list-group-item px-0"><div class="d-flex flex-wrap justify-content-between gap-2">
-                            <div><h3 class="h6 fw-bold mb-1">{{ deliverable.title }}</h3><p class="text-secondary mb-1">{{ deliverable.description|default:"No description" }}</p><small>Uploaded {{ deliverable.uploaded_at|date:"M j, Y, P" }}</small></div>
-                            <div class="text-end">
+                            <div><h3 class="h6 fw-bold mb-1">{{ deliverable.title }}</h3><p class="text-secondary mb-1">{{ deliverable.description|default:"No description" }}</p>{% for entry in deliverable.messages.all %}{% if entry.kind == 'changes_requested' %}<p class="text-break mb-1"><strong>Revision request:</strong> {{ entry.body|linebreaksbr }}</p>{% endif %}{% endfor %}<small>Uploaded {{ deliverable.uploaded_at|date:"M j, Y, P" }}</small></div>
+                            <div class="text-end"><p class="small text-secondary mb-1">Version {{ deliverable.version }} &middot; {% if deliverable.is_current %}Current{% else %}Historical{% endif %}</p><a class="btn btn-sm btn-outline-secondary mt-2" href="{% url 'deliverable_discussion' deliverable.campaign_id deliverable.id %}">Discussion / Versions</a>
                                 {% include 'campaigns/includes/status_badge.html' with status=deliverable.approval_status label=deliverable.get_approval_status_display only %}<br>
                                 {% if deliverable.uploaded_file %}<a class="btn btn-sm btn-outline-primary mt-2" href="{{ deliverable.uploaded_file.url }}" target="_blank" rel="noopener noreferrer">Open file</a>{% else %}<span class="text-secondary">No file available</span>{% endif %}
                             </div>
@@ -41,7 +42,7 @@
                 </div>
             </div></div>
         </div>
-        <div class="col-lg-4">
+        {% if not campaign.is_archived %}<div class="col-lg-4">
             <div class="card border-0 shadow-sm"><div class="card-body p-4">
                 <h2 class="h5 fw-bold mb-3">Update campaign progress</h2>
                 <form method="post">
@@ -52,6 +53,6 @@
                 </form>
             </div></div>
         </div>
-    </div>
+    {% endif %}</div>
 </div></main>
 {% endblock %}

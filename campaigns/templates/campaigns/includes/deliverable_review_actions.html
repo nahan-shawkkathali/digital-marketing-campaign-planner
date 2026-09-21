@@ -1,0 +1,17 @@
+{% if deliverable.approval_status == 'pending' and deliverable.is_current and not deliverable.campaign.is_archived %}
+<div class="d-flex flex-wrap gap-2 mt-2">
+    <form method="post" action="{% url 'client_deliverable_decision' deliverable.campaign_id deliverable.id 'approve' %}">
+        {% csrf_token %}<input type="hidden" name="return_to" value="{{ return_to }}"><input type="hidden" name="status" value="{{ selected_status }}">
+        <button class="btn btn-sm btn-success" type="submit" aria-label="Approve {{ deliverable.title }}">Approve</button>
+    </form>
+    <details class="text-start">
+        <summary class="btn btn-sm btn-outline-warning">Request Changes</summary>
+        <form class="mt-2" method="post" action="{% url 'client_deliverable_decision' deliverable.campaign_id deliverable.id 'request_changes' %}">
+            {% csrf_token %}
+            <label class="form-label" for="revision-comment-{{ deliverable.id }}">Revision comment</label>
+            <textarea class="form-control" id="revision-comment-{{ deliverable.id }}" name="body" rows="3" maxlength="5000" required></textarea>
+            <button class="btn btn-sm btn-warning mt-2" type="submit">Request Changes</button>
+        </form>
+    </details>
+</div>
+{% endif %}

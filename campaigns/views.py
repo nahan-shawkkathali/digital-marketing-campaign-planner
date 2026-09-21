@@ -1,11 +1,12 @@
 from django.contrib.auth import login
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import Count, Q
-from django.http import FileResponse, Http404
+from django.http import FileResponse, Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST, require_http_methods, require_safe
 
 from .forms import (
@@ -21,8 +22,10 @@ from .forms import (
     EmployeeProfileForm,
     EmployeeTaskStatusForm,
     DeliverableUploadForm,
+    DeliverableMessageForm,
+    RevisionRequestForm,
 )
-from .models import Campaign, Deliverable, EmployeeProfile, Task
+from .models import Campaign, Deliverable, DeliverableMessage, EmployeeProfile, Task
 from .reports import campaign_report_context
 
 
@@ -103,6 +106,27 @@ def campaign_request(request):
     return render(request, "campaigns/campaign_request.html", {"form": form})
 
 
+@client_required
+@require_http_methods(["GET", "POST"])
+def client_campaign_edit(request, campaign_id):
+    campaign = get_object_or_404(Campaign, pk=campaign_id, client=request.user)
+    if campaign.is_archived or campaign.status != Campaign.Status.PENDING:
+        return HttpResponseForbidden("Only pending campaigns can be edited.")
+    form = CampaignRequestForm(request.POST if request.method == "POST" else None, instance=campaign)
+    if request.method == "POST" and form.is_valid():
+        # Recheck status in the write itself so approval cannot be overwritten by a stale form.
+        updated = Campaign.objects.filter(
+            pk=campaign.pk, client=request.user, status=Campaign.Status.PENDING, is_archived=False,
+        ).update(**{name: form.cleaned_data[name] for name in form.Meta.fields}, updated_at=timezone.now())
+        if not updated:
+            return HttpResponseForbidden("Only pending campaigns can be edited.")
+        messages.success(request, "Campaign requirements updated.")
+        return redirect("client_campaign_detail", campaign_id=campaign.pk)
+    return render(request, "campaigns/campaign_request.html", {
+        "form": form, "campaign": campaign, "editing": True,
+    })
+
+
 def _client_campaigns(user):
     return Campaign.objects.filter(client=user).select_related("assigned_employee__user")
 
@@ -134,7 +158,7 @@ def client_campaign_list(request, tracking=False):
 @require_GET
 def client_deliverables(request):
     status = _deliverable_filter(request.GET.get("status"))
-    deliverables = Deliverable.objects.filter(campaign__client=request.user).select_related(
+    deliverables = Deliverable.objects.with_current_version().filter(campaign__client=request.user).select_related(
         "campaign", "uploaded_by__user",
     )
     if status != "all":
@@ -143,27 +167,34 @@ def client_deliverables(request):
         "deliverables": deliverables,
         "selected_status": status,
         "status_filters": (("all", "All"), ("pending", "Pending"),
-                           ("approved", "Approved"), ("rejected", "Rejected")),
+                           ("approved", "Approved"), ("changes_requested", "Changes Requested"),
+                           ("rejected", "Rejected")),
     })
 
 
 @client_required
 @require_GET
 def client_reports(request):
+    current_ids = Deliverable.objects.with_current_version().filter(has_newer_version=False).values("pk")
+    current_versions = Q(deliverables__pk__in=current_ids)
     campaigns = _with_task_counts(_client_campaigns(request.user)).annotate(
-        total_deliverables=Count("deliverables", distinct=True),
+        total_deliverables=Count("deliverables", filter=current_versions, distinct=True),
         approved_deliverables=Count(
-            "deliverables", filter=Q(deliverables__approval_status=Deliverable.ApprovalStatus.APPROVED),
+            "deliverables", filter=current_versions & Q(deliverables__approval_status=Deliverable.ApprovalStatus.APPROVED),
             distinct=True,
         ),
         pending_deliverables=Count(
-            "deliverables", filter=Q(deliverables__approval_status=Deliverable.ApprovalStatus.PENDING),
+            "deliverables", filter=current_versions & Q(deliverables__approval_status=Deliverable.ApprovalStatus.PENDING),
             distinct=True,
         ),
         rejected_deliverables=Count(
-            "deliverables", filter=Q(deliverables__approval_status=Deliverable.ApprovalStatus.REJECTED),
+            "deliverables", filter=current_versions & Q(deliverables__approval_status=Deliverable.ApprovalStatus.REJECTED),
             distinct=True,
         ),
+        changes_requested_deliverables=Count(
+            "deliverables", filter=current_versions & Q(deliverables__approval_status=Deliverable.ApprovalStatus.CHANGES_REQUESTED), distinct=True,
+        ),
+        revision_count=Count("deliverables", filter=Q(deliverables__original__isnull=False), distinct=True),
     )
     return render(request, "campaigns/client_reports.html", {"campaigns": campaigns})
 
@@ -175,7 +206,7 @@ def client_campaign_detail(request, campaign_id):
         pk=campaign_id,
         client=request.user,
     )
-    deliverables = campaign.deliverables.select_related("uploaded_by__user")
+    deliverables = campaign.deliverables.with_current_version().select_related("uploaded_by__user")
     total_tasks = campaign.tasks.count()
     completed_tasks = campaign.tasks.filter(status=Task.Status.COMPLETED).count()
     return render(request, "campaigns/client_campaign_detail.html", {
@@ -188,19 +219,30 @@ def client_campaign_detail(request, campaign_id):
 
 @client_required
 @require_POST
+@transaction.atomic
 def client_deliverable_decision(request, campaign_id, deliverable_id, decision):
+    campaign = get_object_or_404(Campaign.objects.select_for_update(), pk=campaign_id,
+                                 client=request.user, is_archived=False)
     deliverables = Deliverable.objects.filter(
         pk=deliverable_id,
         campaign_id=campaign_id,
         campaign__client=request.user,
+        campaign__is_archived=False,
     )
     deliverable = get_object_or_404(deliverables)
     decisions = {
         "approve": Deliverable.ApprovalStatus.APPROVED,
         "reject": Deliverable.ApprovalStatus.REJECTED,
+        "request_changes": Deliverable.ApprovalStatus.CHANGES_REQUESTED,
     }
+    revision_form = RevisionRequestForm(request.POST if decision == "request_changes" else None)
     if decision not in decisions:
         messages.error(request, "Invalid deliverable decision.")
+    elif not deliverable.is_current or deliverable.approval_status != Deliverable.ApprovalStatus.PENDING:
+        messages.error(request, "This deliverable has already been reviewed.")
+    elif decision == "request_changes" and not revision_form.is_valid():
+        return render(request, "campaigns/deliverable_discussion.html",
+                      _discussion_context(request.user, deliverable, revision_form=revision_form))
     elif not deliverables.filter(approval_status=Deliverable.ApprovalStatus.PENDING).update(
         approval_status=decisions[decision],
     ):
@@ -208,7 +250,14 @@ def client_deliverable_decision(request, campaign_id, deliverable_id, decision):
         messages.error(request, "This deliverable has already been reviewed.")
     else:
         deliverable.approval_status = decisions[decision]
+        DeliverableMessage.objects.create(
+            deliverable=deliverable, sender=request.user, kind=decisions[decision],
+            body=revision_form.cleaned_data["body"] if decision == "request_changes"
+                 else f"{deliverable.get_approval_status_display()} version {deliverable.version}.",
+        )
         messages.success(request, f'Deliverable "{deliverable.title}" was {deliverable.get_approval_status_display().lower()}.')
+    if decision == "request_changes" or request.POST.get("return_to") == "discussion":
+        return redirect("deliverable_discussion", campaign_id=campaign.pk, deliverable_id=deliverable.pk)
     if request.POST.get("return_to") == "deliverables":
         destination = reverse("client_deliverables")
         status = _deliverable_filter(request.POST.get("status"))
@@ -281,8 +330,12 @@ def administrator_dashboard(request):
 
 
 @staff_required
+@require_http_methods(["GET", "POST"])
+@transaction.atomic
 def administrator_campaign_detail(request, campaign_id):
-    campaign = get_object_or_404(Campaign.objects.select_related("client", "assigned_employee__user"), pk=campaign_id)
+    campaign = get_object_or_404(Campaign.objects.select_related("client", "assigned_employee__user").select_for_update(of=("self",)), pk=campaign_id)
+    if request.method == "POST" and campaign.is_archived:
+        return HttpResponseForbidden("Archived campaigns cannot be updated.")
     status_form = CampaignStatusForm(
         request.POST if request.method == "POST" and "update_status" in request.POST else None,
         instance=campaign, prefix="status",
@@ -312,10 +365,13 @@ def administrator_campaign_detail(request, campaign_id):
 
 
 @staff_required
+@require_http_methods(["GET", "POST"])
+@transaction.atomic
 def administrator_task_create(request, campaign_id):
     campaign = get_object_or_404(
-        Campaign,
+        Campaign.objects.select_for_update(),
         pk=campaign_id,
+        is_archived=False,
         status__in=(Campaign.Status.APPROVED, Campaign.Status.IN_PROGRESS),
     )
     form = AdministratorTaskForm(request.POST if request.method == "POST" else None, campaign=campaign)
@@ -334,8 +390,9 @@ def administrator_task_create(request, campaign_id):
 
 @staff_required
 @require_POST
+@transaction.atomic
 def administrator_campaign_decision(request, campaign_id, decision):
-    campaign = get_object_or_404(Campaign, pk=campaign_id)
+    campaign = get_object_or_404(Campaign.objects.select_for_update(), pk=campaign_id, is_archived=False)
     decisions = {
         "approve": Campaign.Status.APPROVED,
         "reject": Campaign.Status.REJECTED,
@@ -347,6 +404,68 @@ def administrator_campaign_decision(request, campaign_id, decision):
         campaign.save(update_fields=("status", "updated_at"))
         messages.success(request, f'Campaign "{campaign.name}" was {campaign.get_status_display().lower()}.')
     return redirect("administrator_campaign_detail", campaign_id=campaign.pk)
+
+
+@staff_required
+@require_http_methods(["GET", "POST"])
+@transaction.atomic
+def administrator_task_edit(request, campaign_id, task_id):
+    campaign = get_object_or_404(Campaign.objects.select_for_update(), pk=campaign_id, is_archived=False)
+    task = get_object_or_404(Task, pk=task_id, campaign=campaign)
+    form = AdministratorTaskForm(request.POST if request.method == "POST" else None,
+                                 instance=task, campaign=campaign)
+    if request.method == "POST" and form.is_valid():
+        task = form.save(commit=False)
+        task.save(update_fields=form.Meta.fields)
+        messages.success(request, "Task updated.")
+        return redirect("administrator_campaign_detail", campaign_id=campaign.pk)
+    return render(request, "campaigns/administrator_task_form.html", {
+        "campaign": campaign, "task": task, "form": form, "editing": True,
+    })
+
+
+@staff_required
+@require_http_methods(["GET", "POST"])
+@transaction.atomic
+def administrator_task_delete(request, campaign_id, task_id):
+    campaign = get_object_or_404(Campaign.objects.select_for_update(), pk=campaign_id, is_archived=False)
+    task = get_object_or_404(Task, pk=task_id, campaign=campaign)
+    if request.method == "POST" and request.POST.get("confirm") == "yes":
+        task.delete()
+        messages.success(request, "Task deleted.")
+        return redirect("administrator_campaign_detail", campaign_id=campaign.pk)
+    return render(request, "campaigns/administrator_task_delete.html", {
+        "campaign": campaign, "task": task, "confirmation_error": request.method == "POST",
+    }, status=400 if request.method == "POST" else 200)
+
+
+@staff_required
+@require_http_methods(["GET", "POST"])
+@transaction.atomic
+def administrator_campaign_archive(request, campaign_id):
+    campaign = get_object_or_404(Campaign.objects.select_for_update(), pk=campaign_id)
+    if request.method == "POST" and request.POST.get("confirm") == "yes":
+        if not campaign.is_archived:
+            campaign.is_archived = True
+            campaign.save(update_fields=("is_archived", "updated_at"))
+        messages.success(request, "Campaign archived. Tasks, deliverables and reports have been preserved.")
+        return redirect("administrator_campaign_detail", campaign_id=campaign.pk)
+    return render(request, "campaigns/administrator_campaign_archive.html", {
+        "campaign": campaign, "task_count": campaign.tasks.count(),
+        "deliverable_count": campaign.deliverables.count(),
+        "confirmation_error": request.method == "POST",
+    }, status=400 if request.method == "POST" else 200)
+
+
+@staff_required
+@require_http_methods(["GET", "POST"])
+def administrator_client_create(request):
+    form = ClientRegistrationForm(request.POST if request.method == "POST" else None)
+    if request.method == "POST" and form.is_valid():
+        user = form.save()
+        messages.success(request, f'Client account for "{user.username}" created.')
+        return redirect("administrator_dashboard")
+    return render(request, "campaigns/administrator_client_form.html", {"form": form})
 
 
 @staff_required
@@ -378,7 +497,7 @@ def administrator_employee_edit(request, employee_id):
 
 @employee_required
 def employee_dashboard(request):
-    campaigns = Campaign.objects.filter(assigned_employee=request.user.employee_profile).select_related("client")
+    campaigns = Campaign.objects.filter(assigned_employee=request.user.employee_profile, is_archived=False).select_related("client")
     return render(request, "campaigns/employee_dashboard.html", {"campaigns": campaigns})
 
 
@@ -387,6 +506,7 @@ def employee_dashboard(request):
 def employee_deliverable_campaigns(request):
     campaigns = Campaign.objects.filter(
         assigned_employee=request.user.employee_profile,
+        is_archived=False,
     ).exclude(status__in=(Campaign.Status.PENDING, Campaign.Status.REJECTED)).select_related("client")
     return render(request, "campaigns/employee_deliverable_campaigns.html", {"campaigns": campaigns})
 
@@ -396,6 +516,7 @@ def employee_task_list(request):
     tasks = Task.objects.filter(
         assigned_employee=request.user.employee_profile,
         campaign__assigned_employee=request.user.employee_profile,
+        campaign__is_archived=False,
     ).select_related("campaign")
     return render(request, "campaigns/employee_task_list.html", {"tasks": tasks})
 
@@ -416,6 +537,7 @@ def employee_task_detail(request, task_id):
 
 @employee_required
 @require_POST
+@transaction.atomic
 def employee_task_status_update(request, task_id):
     task = get_object_or_404(
         Task,
@@ -423,6 +545,9 @@ def employee_task_status_update(request, task_id):
         assigned_employee=request.user.employee_profile,
         campaign__assigned_employee=request.user.employee_profile,
     )
+    get_object_or_404(Campaign.objects.select_for_update(), pk=task.campaign_id,
+                      assigned_employee=request.user.employee_profile, is_archived=False)
+    task.refresh_from_db()
     form = EmployeeTaskStatusForm(request.POST, instance=task)
     if task.campaign.status in (Campaign.Status.PENDING, Campaign.Status.REJECTED):
         messages.error(request, "This campaign must be approved before work can be updated.")
@@ -435,12 +560,16 @@ def employee_task_status_update(request, task_id):
 
 
 @employee_required
+@require_http_methods(["GET", "POST"])
+@transaction.atomic
 def employee_campaign_detail(request, campaign_id):
     campaign = get_object_or_404(
-        Campaign.objects.select_related("client"),
+        Campaign.objects.select_related("client").select_for_update(of=("self",)),
         pk=campaign_id,
         assigned_employee=request.user.employee_profile,
     )
+    if request.method == "POST" and campaign.is_archived:
+        return HttpResponseForbidden("Archived campaigns cannot be updated.")
     form = EmployeeCampaignProgressForm(request.POST if request.method == "POST" else None, instance=campaign)
     if request.method == "POST" and form.is_valid():
         form.save()
@@ -450,18 +579,20 @@ def employee_campaign_detail(request, campaign_id):
         campaign.refresh_from_db()
     return render(request, "campaigns/employee_campaign_detail.html", {
         "campaign": campaign,
-        "deliverables": campaign.deliverables.select_related("uploaded_by__user"),
+        "deliverables": campaign.deliverables.with_current_version().select_related("uploaded_by__user").prefetch_related("messages"),
         "progress_form": form,
     })
 
 
 @employee_required
 @require_http_methods(["GET", "POST"])
+@transaction.atomic
 def employee_deliverable_upload(request, campaign_id):
     campaign = get_object_or_404(
-        Campaign,
+        Campaign.objects.select_for_update(),
         pk=campaign_id,
         assigned_employee=request.user.employee_profile,
+        is_archived=False,
     )
     form = DeliverableUploadForm(request.POST if request.method == "POST" else None, request.FILES or None)
     if request.method == "POST" and campaign.status in (Campaign.Status.PENDING, Campaign.Status.REJECTED):
@@ -476,6 +607,96 @@ def employee_deliverable_upload(request, campaign_id):
     return render(request, "campaigns/employee_deliverable_upload.html", {
         "campaign": campaign,
         "form": form,
+    })
+
+
+def _authorized_deliverable(user, campaign_id, deliverable_id):
+    deliverables = Deliverable.objects.select_related("campaign", "uploaded_by__user")
+    if user.is_staff or user.is_superuser:
+        pass
+    elif hasattr(user, "employee_profile"):
+        deliverables = deliverables.filter(campaign__assigned_employee=user.employee_profile)
+    else:
+        deliverables = deliverables.filter(campaign__client=user)
+    return get_object_or_404(deliverables, pk=deliverable_id, campaign_id=campaign_id)
+
+
+def _discussion_context(user, deliverable, message_form=None, revision_form=None):
+    versions = list(deliverable.revision_history().select_related("uploaded_by__user"))
+    current = versions[-1]
+    campaign = deliverable.campaign
+    is_staff = user.is_staff or user.is_superuser
+    is_owner = is_client(user) and campaign.client_id == user.pk
+    is_employee = not is_staff and hasattr(user, "employee_profile") and campaign.assigned_employee_id == user.employee_profile.pk
+    return {
+        "campaign": campaign, "deliverable": deliverable, "versions": versions, "current_version": current,
+        "discussion_messages": DeliverableMessage.objects.filter(deliverable__in=versions).select_related("sender", "deliverable"),
+        "message_form": message_form if message_form is not None else DeliverableMessageForm(),
+        "revision_form": revision_form if revision_form is not None else RevisionRequestForm(),
+        "can_message": not campaign.is_archived and (is_owner or is_employee),
+        "can_review": not campaign.is_archived and is_owner and current.approval_status == Deliverable.ApprovalStatus.PENDING,
+        "can_upload_revision": not campaign.is_archived and is_employee and
+            campaign.status not in (Campaign.Status.PENDING, Campaign.Status.REJECTED) and
+            current.approval_status in (Deliverable.ApprovalStatus.CHANGES_REQUESTED, Deliverable.ApprovalStatus.REJECTED),
+        "campaign_detail_url_name": "administrator_campaign_detail" if is_staff else
+                                    "employee_campaign_detail" if is_employee else "client_campaign_detail",
+    }
+
+
+@login_required(login_url="login")
+@require_http_methods(["GET", "POST"])
+@transaction.atomic
+def deliverable_discussion(request, campaign_id, deliverable_id):
+    # All related writes lock the campaign so archive/reassignment cannot race authorization.
+    get_object_or_404(Campaign.objects.select_for_update(), pk=campaign_id)
+    deliverable = _authorized_deliverable(request.user, campaign_id, deliverable_id)
+    form = DeliverableMessageForm(request.POST if request.method == "POST" else None)
+    context = _discussion_context(request.user, deliverable, message_form=form)
+    if request.method == "POST":
+        if not context["can_message"]:
+            return HttpResponseForbidden("This discussion is read-only.")
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.deliverable = deliverable
+            message.sender = request.user
+            message.save()
+            return redirect("deliverable_discussion", campaign_id=campaign_id, deliverable_id=deliverable_id)
+    return render(request, "campaigns/deliverable_discussion.html", context)
+
+
+@employee_required
+@require_http_methods(["GET", "POST"])
+@transaction.atomic
+def employee_deliverable_revision(request, campaign_id, deliverable_id):
+    campaign = get_object_or_404(Campaign.objects.select_for_update(), pk=campaign_id,
+                                 assigned_employee=request.user.employee_profile, is_archived=False)
+    previous = get_object_or_404(Deliverable, pk=deliverable_id, campaign=campaign)
+    if (campaign.status in (Campaign.Status.PENDING, Campaign.Status.REJECTED) or
+        not previous.is_current or previous.approval_status not in (
+            Deliverable.ApprovalStatus.CHANGES_REQUESTED, Deliverable.ApprovalStatus.REJECTED)):
+        return HttpResponseForbidden("Only the current deliverable awaiting changes can be revised.")
+    form = DeliverableUploadForm(request.POST if request.method == "POST" else None,
+                                 request.FILES or None, initial={"title": previous.title, "description": previous.description})
+    if request.method == "POST" and form.is_valid():
+        revision = form.save(commit=False)
+        revision.campaign = campaign
+        revision.uploaded_by = request.user.employee_profile
+        revision.original_id = previous.original_id or previous.pk
+        revision.version = previous.version + 1
+        revision.approval_status = Deliverable.ApprovalStatus.PENDING
+        try:
+            with transaction.atomic():
+                revision.save()
+        except IntegrityError:
+            # Storage uses a fresh filename; remove only this failed attempt's new file.
+            if revision.uploaded_file._committed:
+                revision.uploaded_file.delete(save=False)
+            return HttpResponse("A newer revision already exists. Reload the discussion.", status=409)
+        messages.success(request, f"Version {revision.version} uploaded for review.")
+        return redirect("deliverable_discussion", campaign_id=campaign.pk, deliverable_id=revision.pk)
+    return render(request, "campaigns/employee_deliverable_upload.html", {
+        "campaign": campaign, "form": form, "revising": True, "previous": previous,
+        "next_version": previous.version + 1,
     })
 
 

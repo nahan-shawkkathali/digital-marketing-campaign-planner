@@ -1,0 +1,625 @@
+{
+  "result": "PASS",
+  "method": "Chrome headless rendering of isolated Django HTML snapshots",
+  "checks": [
+    {
+      "page": "home",
+      "width": 1440,
+      "scrollWidth": 1425,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "register",
+      "width": 1440,
+      "scrollWidth": 1425,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "client_dashboard",
+      "width": 1440,
+      "scrollWidth": 1425,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "login",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "client_profile",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "client_campaign_list_empty",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "client_campaign_tracking_empty",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "client_deliverables_empty",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "client_reports_empty",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "campaign_request",
+      "width": 1440,
+      "scrollWidth": 1425,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "administrator_login",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "administrator_dashboard",
+      "width": 1440,
+      "scrollWidth": 1425,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "administrator_campaign_detail",
+      "width": 1440,
+      "scrollWidth": 1425,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "administrator_employee_create",
+      "width": 1440,
+      "scrollWidth": 1425,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "administrator_task_create",
+      "width": 1440,
+      "scrollWidth": 1425,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "employee_login",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "employee_dashboard",
+      "width": 1440,
+      "scrollWidth": 1425,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "employee_campaign_detail",
+      "width": 1440,
+      "scrollWidth": 1425,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "employee_task_list",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "employee_task_detail",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "employee_deliverable_campaigns",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "employee_deliverable_upload",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "client_campaign_tracking",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "client_deliverables_pending",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "client_campaign_report",
+      "width": 1440,
+      "scrollWidth": 1425,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "administrator_campaign_report",
+      "width": 1440,
+      "scrollWidth": 1425,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "client_campaign_list",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "client_deliverables",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "client_reports",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "client_campaign_detail",
+      "width": 1440,
+      "scrollWidth": 1425,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "administrator_employee_list",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "administrator_employee_edit",
+      "width": 1440,
+      "scrollWidth": 1425,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "employee_profile",
+      "width": 1440,
+      "scrollWidth": 1425,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "employee_deliverable_campaigns_empty",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mobileMenu": "desktop"
+    },
+    {
+      "page": "home",
+      "width": 390,
+      "scrollWidth": 375,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "register",
+      "width": 390,
+      "scrollWidth": 375,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_dashboard",
+      "width": 390,
+      "scrollWidth": 375,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "login",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_profile",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_campaign_list_empty",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_campaign_tracking_empty",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_deliverables_empty",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_reports_empty",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "campaign_request",
+      "width": 390,
+      "scrollWidth": 375,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "administrator_login",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "administrator_dashboard",
+      "width": 390,
+      "scrollWidth": 375,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "administrator_campaign_detail",
+      "width": 390,
+      "scrollWidth": 375,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "administrator_employee_create",
+      "width": 390,
+      "scrollWidth": 375,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "administrator_task_create",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_login",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_dashboard",
+      "width": 390,
+      "scrollWidth": 375,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_campaign_detail",
+      "width": 390,
+      "scrollWidth": 375,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_task_list",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_task_detail",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_deliverable_campaigns",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_deliverable_upload",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_campaign_tracking",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_deliverables_pending",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_campaign_report",
+      "width": 390,
+      "scrollWidth": 375,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "administrator_campaign_report",
+      "width": 390,
+      "scrollWidth": 375,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_campaign_list",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_deliverables",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_reports",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_campaign_detail",
+      "width": 390,
+      "scrollWidth": 375,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "administrator_employee_list",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "administrator_employee_edit",
+      "width": 390,
+      "scrollWidth": 375,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_profile",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_deliverable_campaigns_empty",
+      "width": 390,
+      "scrollWidth": 390,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "home",
+      "width": 320,
+      "scrollWidth": 305,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "register",
+      "width": 320,
+      "scrollWidth": 305,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_dashboard",
+      "width": 320,
+      "scrollWidth": 305,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "login",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_profile",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_campaign_list_empty",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_campaign_tracking_empty",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_deliverables_empty",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_reports_empty",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "campaign_request",
+      "width": 320,
+      "scrollWidth": 305,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "administrator_login",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "administrator_dashboard",
+      "width": 320,
+      "scrollWidth": 305,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "administrator_campaign_detail",
+      "width": 320,
+      "scrollWidth": 305,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "administrator_employee_create",
+      "width": 320,
+      "scrollWidth": 305,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "administrator_task_create",
+      "width": 320,
+      "scrollWidth": 305,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_login",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_dashboard",
+      "width": 320,
+      "scrollWidth": 305,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_campaign_detail",
+      "width": 320,
+      "scrollWidth": 305,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_task_list",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_task_detail",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_deliverable_campaigns",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_deliverable_upload",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_campaign_tracking",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_deliverables_pending",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_campaign_report",
+      "width": 320,
+      "scrollWidth": 305,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "administrator_campaign_report",
+      "width": 320,
+      "scrollWidth": 305,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_campaign_list",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_deliverables",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_reports",
+      "width": 320,
+      "scrollWidth": 305,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "client_campaign_detail",
+      "width": 320,
+      "scrollWidth": 305,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "administrator_employee_list",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "administrator_employee_edit",
+      "width": 320,
+      "scrollWidth": 305,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_profile",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    },
+    {
+      "page": "employee_deliverable_campaigns_empty",
+      "width": 320,
+      "scrollWidth": 320,
+      "mobileMenu": "PASS"
+    }
+  ],
+  "print": {
+    "buttonInvokesPrint": true,
+    "hidden": true,
+    "reportVisible": true,
+    "pdfBytes": 97384
+  },
+  "errors": []
+}

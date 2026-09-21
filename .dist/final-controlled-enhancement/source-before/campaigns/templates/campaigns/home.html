@@ -1,0 +1,72 @@
+{% extends 'campaigns/base.html' %}
+{% block content %}
+<main>
+        <section class="hero-section text-white">
+            <div class="container py-5">
+                <div class="row align-items-center min-vh-50 py-5">
+                    <div class="col-lg-8 mx-auto text-center">
+                        <span class="badge rounded-pill mb-3">Plan. Collaborate. Grow.</span>
+                        <h1 class="display-4 fw-bold mb-4">Digital Marketing Campaign Planner</h1>
+                        <p class="lead mb-0">
+                            Organize client campaigns, coordinate marketing work, and keep every campaign goal in one clear, simple workspace.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="roles" class="roles-section py-5">
+            <div class="container py-4">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold">Choose your role</h2>
+                    <p class="text-secondary mb-0">Choose the workspace that matches your role.</p>
+                </div>
+                <div class="row g-4 justify-content-center">
+                    <div class="col-md-6 col-lg-4">
+                        <div class="role-card card h-100 border-0 shadow-sm text-center">
+                            <div class="card-body p-4 p-xl-5">
+                                <div class="role-icon mx-auto mb-4">C</div>
+                                <h3 class="h4 fw-bold">Client</h3>
+                                <p class="text-secondary">Review campaign plans, goals, and progress from one convenient place.</p>
+                                {% if user.is_authenticated and not user.is_staff and not user.is_superuser and not user.employee_profile %}
+                                    <a class="btn btn-primary w-100" href="{% url 'client_dashboard' %}">Open Client Dashboard</a>
+                                {% else %}
+                                    <a class="btn btn-primary w-100 mb-2" href="{% url 'login' %}">Client Login</a>
+                                    <a class="btn btn-outline-primary w-100" href="{% url 'register' %}">Create Client Account</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="role-card card h-100 border-0 shadow-sm text-center">
+                            <div class="card-body p-4 p-xl-5">
+                                <div class="role-icon mx-auto mb-4">M</div>
+                                <h3 class="h4 fw-bold">Marketing Employee</h3>
+                                <p class="text-secondary">Plan campaign activities and keep marketing work organized.</p>
+                                {% if user.is_authenticated and user.employee_profile %}
+                                    <a class="btn btn-primary w-100" href="{% url 'employee_dashboard' %}">Open Employee Dashboard</a>
+                                {% else %}
+                                    <a class="btn btn-primary w-100" href="{% url 'employee_login' %}">Employee Login</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="role-card card h-100 border-0 shadow-sm text-center">
+                            <div class="card-body p-4 p-xl-5">
+                                <div class="role-icon mx-auto mb-4">A</div>
+                                <h3 class="h4 fw-bold">Administrator</h3>
+                                <p class="text-secondary">Oversee users, campaigns, and the overall planning system.</p>
+                                {% if user.is_staff or user.is_superuser %}
+                                    <a class="btn btn-primary w-100" href="{% url 'administrator_dashboard' %}">Open Administrator Dashboard</a>
+                                {% else %}
+                                    <a class="btn btn-primary w-100" href="{% url 'administrator_login' %}">Administrator Login</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+</main>
+{% endblock %}

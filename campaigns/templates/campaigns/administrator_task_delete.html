@@ -1,0 +1,17 @@
+{% extends 'campaigns/base.html' %}
+{% block title %}Delete Task | Campaign Planner{% endblock %}
+{% block content %}
+<main class="py-5"><div class="container"><div class="row justify-content-center"><div class="col-lg-7">
+    <div class="card border-0 shadow-sm"><div class="card-body p-4 p-lg-5">
+        <h1 class="h3 fw-bold">Delete Task</h1>
+        <p class="fw-semibold text-break">{{ task.title }}</p>
+        <p>Campaign: {{ campaign.name }}</p>
+        <p>This permanently deletes this task. Task totals in the campaign report will be recalculated. Other tasks, the campaign and its deliverables will be preserved.</p>
+        {% if confirmation_error %}<div class="alert alert-danger">Please confirm the deletion.</div>{% endif %}
+        <form method="post">{% csrf_token %}
+            <button class="btn btn-danger" type="submit" name="confirm" value="yes">Confirm Delete</button>
+            <a class="btn btn-outline-secondary" href="{% url 'administrator_campaign_detail' campaign.id %}">Cancel</a>
+        </form>
+    </div></div>
+</div></div></div></main>
+{% endblock %}

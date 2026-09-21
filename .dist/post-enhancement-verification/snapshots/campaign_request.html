@@ -1,0 +1,124 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Request Campaign | Campaign Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/campaigns/css/home.css">
+    
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+        <div class="container py-2">
+            <a class="navbar-brand fw-bold" href="/">Campaign Planner</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="mainNavigation">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    
+                        
+                            <li class="nav-item"><a class="nav-link" href="/client/dashboard/">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/client/campaigns/">Campaigns</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/client/campaigns/track/">Track Progress</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/client/profile/">Profile</a></li>
+                        
+                        <li class="nav-item"><form method="post" action="/client/logout/"><input type="hidden" name="csrfmiddlewaretoken" value="zGD5vKWaYfFFDuTQ4R9iZzBiUSPMRS1nDE7FtHFeyWEw850jqSgeciBZqtNj6Y12"><button class="btn btn-outline-light btn-sm" type="submit">Log out</button></form></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+<main class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <a class="btn btn-link px-0 mb-3" href="/client/dashboard/">&larr; Back to dashboard</a>
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4 p-lg-5">
+                        <h1 class="h3 fw-bold mb-2">Request a Campaign</h1>
+                        <p class="text-secondary mb-4">Enter the goals and requirements for your marketing campaign.</p>
+                        <form method="post" novalidate>
+                            <input type="hidden" name="csrfmiddlewaretoken" value="zGD5vKWaYfFFDuTQ4R9iZzBiUSPMRS1nDE7FtHFeyWEw850jqSgeciBZqtNj6Y12">
+                            
+                            
+                                <div class="mb-3">
+                                    <label class="form-label" for="id_name">Name</label>
+                                    <input type="text" name="name" maxlength="200" class="form-control" required id="id_name">
+                                    
+                                    
+                                </div>
+                            
+                                <div class="mb-3">
+                                    <label class="form-label" for="id_description">Description</label>
+                                    <textarea name="description" cols="40" rows="5" class="form-control" required id="id_description">
+</textarea>
+                                    
+                                    
+                                </div>
+                            
+                                <div class="mb-3">
+                                    <label class="form-label" for="id_campaign_type">Campaign type</label>
+                                    <input type="text" name="campaign_type" maxlength="100" class="form-control" id="id_campaign_type">
+                                    
+                                    
+                                </div>
+                            
+                                <div class="mb-3">
+                                    <label class="form-label" for="id_target_audience">Target audience</label>
+                                    <input type="text" name="target_audience" maxlength="255" class="form-control" id="id_target_audience">
+                                    
+                                    
+                                </div>
+                            
+                                <div class="mb-3">
+                                    <label class="form-label" for="id_budget">Budget</label>
+                                    <input type="number" name="budget" step="0.01" class="form-control" id="id_budget">
+                                    
+                                    
+                                </div>
+                            
+                                <div class="mb-3">
+                                    <label class="form-label" for="id_start_date">Start date</label>
+                                    <input type="date" name="start_date" class="form-control" id="id_start_date">
+                                    
+                                    
+                                </div>
+                            
+                                <div class="mb-3">
+                                    <label class="form-label" for="id_end_date">End date</label>
+                                    <input type="date" name="end_date" class="form-control" id="id_end_date">
+                                    
+                                    
+                                </div>
+                            
+                                <div class="mb-3">
+                                    <label class="form-label" for="id_platforms">Platforms</label>
+                                    <input type="text" name="platforms" maxlength="255" class="form-control" id="id_platforms">
+                                    
+                                    
+                                </div>
+                            
+                                <div class="mb-3">
+                                    <label class="form-label" for="id_campaign_goal">Campaign Goal</label>
+                                    <textarea name="campaign_goal" cols="40" rows="4" class="form-control" id="id_campaign_goal">
+</textarea>
+                                    
+                                    
+                                </div>
+                            
+                            <button class="btn btn-primary" type="submit">Submit Campaign Request</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+    <footer class="py-4 text-center text-secondary"><div class="container">Digital Marketing Campaign Planner</div></footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

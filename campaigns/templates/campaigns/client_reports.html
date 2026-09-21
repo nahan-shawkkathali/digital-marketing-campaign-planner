@@ -18,7 +18,7 @@
                                 <dt>Campaign progress</dt><dd>{{ campaign.progress_percentage }}%</dd>
                                 <dt>Assigned employee</dt><dd class="text-break">{{ campaign.assigned_employee|default:"Not assigned" }}</dd>
                                 <dt>Tasks</dt><dd>{{ campaign.completed_tasks }} / {{ campaign.total_tasks }} completed</dd>
-                                <dt>Deliverables</dt><dd class="mb-0">{% if campaign.total_deliverables %}{{ campaign.approved_deliverables }} approved, {{ campaign.pending_deliverables }} pending review, {{ campaign.rejected_deliverables }} rejected{% else %}No deliverables uploaded yet.{% endif %}</dd>
+                                <dt>Deliverables</dt><dd class="mb-0">{% if campaign.total_deliverables %}{{ campaign.approved_deliverables }} approved, {{ campaign.pending_deliverables }} pending review, {{ campaign.rejected_deliverables }} rejected, {{ campaign.changes_requested_deliverables }} changes requested{% if campaign.revision_count %}; {{ campaign.revision_count }} revision{{ campaign.revision_count|pluralize }}{% endif %}{% else %}No deliverables uploaded yet.{% endif %}</dd>
                             </dl>
                             <a class="btn btn-outline-primary align-self-start mt-auto" href="{% url 'client_campaign_report' campaign.id %}" aria-label="View report: {{ campaign.name }}">View Report</a>
                         </div>
