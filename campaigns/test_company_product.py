@@ -1,8 +1,10 @@
+from datetime import timedelta
 from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.test import Client
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.html import escape
 
 from .forms import CampaignRequestForm, ClientProfileForm
@@ -25,7 +27,8 @@ class CompanyProductTests(AuditFixtures):
             "name": "New Product Launch Campaign", "description": "Promote our new product.",
             "campaign_type": "Social Media", "product_service_name": self.product_service_name,
             "target_audience": "Local shoppers", "budget": "5000.00",
-            "start_date": "2026-10-01", "end_date": "2026-10-31",
+            "start_date": timezone.localdate().isoformat(),
+            "end_date": (timezone.localdate() + timedelta(days=30)).isoformat(),
             "platforms": "Instagram, Facebook, YouTube",
             "campaign_goal": "Increase product awareness and generate sales.", **overrides,
         }
@@ -200,7 +203,7 @@ class CompanyProductTests(AuditFixtures):
     def test_product_length_and_existing_budget_date_validation(self):
         self.client.force_login(self.owner)
         for changes, field in (({"product_service_name": "x" * 256}, "product_service_name"),
-                               ({"budget": "-1"}, "budget"), ({"end_date": "2026-09-30"}, "end_date")):
+                               ({"budget": "-1"}, "budget"), ({"end_date": (timezone.localdate() - timedelta(days=1)).isoformat()}, "end_date")):
             with self.subTest(field=field):
                 response = self.client.post(reverse("campaign_request"), self.request_data(**changes))
                 self.assertEqual(response.status_code, 200)

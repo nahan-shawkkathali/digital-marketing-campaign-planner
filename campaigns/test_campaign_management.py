@@ -1,7 +1,9 @@
+from datetime import timedelta
 from unittest.mock import patch
 
 from django.test import Client
 from django.urls import reverse
+from django.utils import timezone
 
 from .forms import CampaignAssignmentForm, CampaignRequestForm
 from .models import Campaign, Deliverable, Task
@@ -20,7 +22,8 @@ class PendingCampaignEditTests(AuditFixtures):
         return {"name": "Corrected Campaign", "description": "Corrected requirements",
                 "campaign_type": "Social", "product_service_name": "Serum", "budget": "123.00",
                 "target_audience": "Shoppers", "platforms": "Instagram", "campaign_goal": "Awareness",
-                "start_date": "2026-10-01", "end_date": "2026-10-31", **overrides}
+                "start_date": timezone.localdate().isoformat(),
+                "end_date": (timezone.localdate() + timedelta(days=30)).isoformat(), **overrides}
 
     def test_owner_can_edit_all_request_fields_without_changing_protected_fields(self):
         response = self.client.get(self.url)
@@ -63,7 +66,7 @@ class PendingCampaignEditTests(AuditFixtures):
             self.assertContains(self.client.get(reverse(page, args=args)), self.url)
 
     def test_invalid_budget_dates_and_required_fields_do_not_save(self):
-        for changes, field in (({"budget": "-1"}, "budget"), ({"end_date": "2026-09-01"}, "end_date"),
+        for changes, field in (({"budget": "-1"}, "budget"), ({"end_date": (timezone.localdate() - timedelta(days=1)).isoformat()}, "end_date"),
                                ({"name": ""}, "name")):
             response = self.client.post(self.url, self.data(**changes))
             self.assertIn(field, response.context["form"].errors)

@@ -4,6 +4,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.core.validators import FileExtensionValidator
 from django.core.exceptions import ValidationError
 
+from .file_validation import ALLOWED_EXTENSIONS, VIDEO_TYPES, validate_deliverable_content
+
 
 class ClientProfile(models.Model):
     user = models.OneToOneField(
@@ -110,7 +112,7 @@ class Deliverable(models.Model):
     description = models.TextField(blank=True)
     uploaded_file = models.FileField(
         upload_to="deliverables/%Y/%m/%d/",
-        validators=[FileExtensionValidator(["pdf", "docx", "jpg", "jpeg", "png"])],
+        validators=[FileExtensionValidator(ALLOWED_EXTENSIONS), validate_deliverable_content],
     )
     approval_status = models.CharField(
         max_length=20,
@@ -149,6 +151,11 @@ class Deliverable(models.Model):
         return Deliverable.objects.filter(
             models.Q(pk=original_id) | models.Q(original_id=original_id),
         ).order_by("version", "pk")
+
+    @property
+    def video_content_type(self):
+        extension = self.uploaded_file.name.rsplit(".", 1)[-1].lower() if self.uploaded_file else ""
+        return VIDEO_TYPES.get(extension, "")
 
     @property
     def is_current(self):

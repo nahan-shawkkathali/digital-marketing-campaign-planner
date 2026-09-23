@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import IntegrityError, transaction
 from django.db.models import Count, Q
-from django.http import FileResponse, Http404, HttpResponse, HttpResponseForbidden
+from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -27,6 +27,7 @@ from .forms import (
 )
 from .models import Campaign, Deliverable, DeliverableMessage, EmployeeProfile, Task
 from .reports import campaign_report_context
+from .file_responses import protected_file_response
 
 
 def staff_required(view_func):
@@ -282,7 +283,7 @@ def deliverable_file(request, file_path):
         deliverables = deliverables.filter(campaign__client=request.user)
     deliverable = get_object_or_404(deliverables)
     try:
-        response = FileResponse(deliverable.uploaded_file.open("rb"))
+        response = protected_file_response(request, deliverable)
     except FileNotFoundError as error:
         raise Http404("File not found.") from error
     response["Cache-Control"] = "private, no-store"

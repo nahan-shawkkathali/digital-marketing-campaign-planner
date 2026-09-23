@@ -1,6 +1,9 @@
+from datetime import timedelta
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client
 from django.urls import reverse
+from django.utils import timezone
 
 from .models import Campaign, ClientProfile, Deliverable, DeliverableMessage, Task
 from .test_audit import AuditFixtures
@@ -109,7 +112,8 @@ class ControlledEnhancementEndToEndTests(AuditFixtures):
         request = {"name": "Agency Launch", "description": "Launch requirements", "campaign_type": "Social",
                    "product_service_name": "Vitamin C Serum", "budget": "5000.00", "target_audience": "Shoppers",
                    "platforms": "Instagram, Facebook", "campaign_goal": "Product awareness",
-                   "start_date": "2026-10-01", "end_date": "2026-10-31"}
+                   "start_date": timezone.localdate().isoformat(),
+                   "end_date": (timezone.localdate() + timedelta(days=30)).isoformat()}
         self.assertRedirects(self.post(client, reverse("campaign_request"), request), reverse("client_campaign_list"))
         campaign = Campaign.objects.get(name="Agency Launch")
         self.assertEqual(campaign.status, Campaign.Status.PENDING)

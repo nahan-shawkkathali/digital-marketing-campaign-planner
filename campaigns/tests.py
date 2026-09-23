@@ -1,9 +1,11 @@
 import tempfile
+from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from .models import Campaign, Deliverable, EmployeeProfile, Task
 
@@ -53,8 +55,8 @@ class ClientAuthenticationTests(TestCase):
             "description": "Launch the new product on social media.",
             "target_audience": "College students",
             "budget": "25000.00",
-            "start_date": "2026-09-10",
-            "end_date": "2026-10-10",
+            "start_date": timezone.localdate().isoformat(),
+            "end_date": (timezone.localdate() + timedelta(days=30)).isoformat(),
         })
         self.assertRedirects(response, reverse("client_campaign_list"))
         campaign = Campaign.objects.get(name="Social Media Launch")

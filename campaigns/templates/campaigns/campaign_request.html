@@ -29,4 +29,24 @@
         </div>
     </div>
 </main>
+<script>
+(() => {
+    const start = document.getElementById("{{ form.start_date.id_for_label|escapejs }}");
+    const end = document.getElementById("{{ form.end_date.id_for_label|escapejs }}");
+    const updateDateMinimums = () => {
+        start.min = start.value && start.value === start.dataset.originalDate
+            ? start.dataset.originalDate : start.dataset.minDate;
+        const selected = start.valueAsDate;
+        if (selected && start.value < "9999-12-31") {
+            selected.setUTCDate(selected.getUTCDate() + 1);
+            end.min = selected.toISOString().slice(0, 10);
+        } else {
+            end.removeAttribute("min");
+        }
+    };
+    start.addEventListener("input", updateDateMinimums);
+    start.addEventListener("change", updateDateMinimums);
+    updateDateMinimums();
+})();
+</script>
 {% endblock %}

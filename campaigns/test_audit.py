@@ -1,10 +1,12 @@
 import tempfile
+from datetime import timedelta
 from pathlib import Path
 
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from .models import Campaign, Deliverable, EmployeeProfile, Task
 
@@ -278,7 +280,8 @@ class FinalWorkflowAuditTests(AuditFixtures):
         self.client.force_login(self.owner)
         response = self.client.post(reverse("campaign_request"), {
             "name": "Submission Demo", "description": "Launch campaign", "campaign_type": "Social Media",
-            "budget": "5000.00", "start_date": "2026-09-10", "end_date": "2026-10-10",
+            "budget": "5000.00", "start_date": timezone.localdate().isoformat(),
+            "end_date": (timezone.localdate() + timedelta(days=30)).isoformat(),
             "client": self.other_client.pk, "status": Campaign.Status.COMPLETED,
         })
         self.assertRedirects(response, reverse("client_campaign_list"))

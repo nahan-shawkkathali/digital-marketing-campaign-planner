@@ -1,7 +1,10 @@
+from datetime import date, timedelta
+
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.utils import timezone
 
 from .models import Campaign, ClientProfile, Deliverable, DeliverableMessage, EmployeeProfile, Task
 
@@ -130,13 +133,29 @@ class CampaignRequestForm(BootstrapFormMixin, forms.ModelForm):
         widgets = {
             "description": forms.Textarea(attrs={"rows": 5}),
             "campaign_goal": forms.Textarea(attrs={"rows": 4}),
-            "start_date": forms.DateInput(attrs={"type": "date"}),
-            "end_date": forms.DateInput(attrs={"type": "date"}),
+            "start_date": forms.DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
+            "end_date": forms.DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.apply_bootstrap_styles()
+        # Keep the saved date before ModelForm validation updates the instance.
+        self._original_start_date = self.instance.start_date if not self.instance._state.adding else None
+        today = timezone.localdate()
+        start_attrs = self.fields["start_date"].widget.attrs
+        start_attrs["min"] = start_attrs["data-min-date"] = today.isoformat()
+        if self._original_start_date and self._original_start_date < today:
+            start_attrs["data-original-date"] = self._original_start_date.isoformat()
+        try:
+            start_date = self.fields["start_date"].to_python(self["start_date"].value())
+        except forms.ValidationError:
+            start_date = None
+        if start_date:
+            if start_date == self._original_start_date and start_date < today:
+                start_attrs["min"] = start_date.isoformat()
+            if start_date < date.max:
+                self.fields["end_date"].widget.attrs["min"] = (start_date + timedelta(days=1)).isoformat()
 
     def clean_budget(self):
         budget = self.cleaned_data["budget"]
@@ -148,8 +167,10 @@ class CampaignRequestForm(BootstrapFormMixin, forms.ModelForm):
         cleaned_data = super().clean()
         start_date = cleaned_data.get("start_date")
         end_date = cleaned_data.get("end_date")
-        if start_date and end_date and end_date < start_date:
-            self.add_error("end_date", "End date cannot be before the start date.")
+        if start_date and start_date < timezone.localdate() and start_date != self._original_start_date:
+            self.add_error("start_date", "Start date cannot be in the past.")
+        if start_date and end_date and end_date <= start_date:
+            self.add_error("end_date", "End date must be after the start date.")
         return cleaned_data
 
 
@@ -309,7 +330,7 @@ class DeliverableUploadForm(BootstrapFormMixin, forms.ModelForm):
         widgets = {
             "description": forms.Textarea(attrs={"rows": 4}),
             "uploaded_file": forms.ClearableFileInput(
-                attrs={"accept": ".pdf,.docx,.jpg,.jpeg,.png"},
+                attrs={"accept": ".pdf,.docx,.jpg,.jpeg,.png,.mp4,.mov,.webm"},
             ),
         }
 

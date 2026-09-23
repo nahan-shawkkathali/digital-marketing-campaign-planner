@@ -1,5 +1,7 @@
 {% extends 'campaigns/base.html' %}
+{% load static tz %}
 {% block title %}{{ current_version.title }} | Deliverable Discussion{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'campaigns/css/discussion.css' %}">{% endblock %}
 {% block content %}
 <main class="py-5"><div class="container"><div class="row justify-content-center"><div class="col-lg-9">
     <a class="btn btn-link px-0 mb-3" href="{% url campaign_detail_url_name campaign.id %}">&larr; Back to campaign</a>
@@ -11,6 +13,7 @@
         <p><strong>Current version: {{ current_version.version }}</strong> {% include 'campaigns/includes/status_badge.html' with status=current_version.approval_status label=current_version.get_approval_status_display only %}</p>
         <p class="text-break">{{ current_version.description|linebreaksbr }}</p>
         {% if current_version.uploaded_file %}<a class="btn btn-outline-primary" href="{{ current_version.uploaded_file.url }}" target="_blank" rel="noopener noreferrer">Open Current File</a>{% endif %}
+        {% include 'campaigns/includes/deliverable_video.html' with deliverable=current_version only %}
         {% if can_upload_revision %}<a class="btn btn-primary" href="{% url 'employee_deliverable_revision' campaign.id current_version.id %}">Upload Revised Version</a>{% endif %}
         {% if can_review %}
             <form class="mt-3" method="post" action="{% url 'client_deliverable_decision' campaign.id current_version.id 'approve' %}">{% csrf_token %}<input type="hidden" name="return_to" value="discussion"><button class="btn btn-success" type="submit">Approve</button></form>
@@ -30,15 +33,27 @@
             <p class="small text-secondary mb-1">{{ version.uploaded_by }} &middot; {{ version.uploaded_at|date:"M j, Y, H:i T" }}</p>
             <p class="text-break mb-1">{{ version.title }}</p>
             {% if version.uploaded_file %}<a href="{{ version.uploaded_file.url }}" target="_blank" rel="noopener noreferrer">Open Version {{ version.version }}</a>{% endif %}
+            {% if version.video_content_type %}<a class="ms-2" href="{{ version.uploaded_file.url }}?download=1">Download video</a>{% endif %}
         </div>{% endfor %}
         </div>
     </div></div>
-    <div class="card border-0 shadow-sm"><div class="card-body p-4">
+    <div class="discussion-card card border-0 shadow-sm"><div class="card-body p-4"><div class="discussion-conversation">
         <h2 class="h5 fw-bold">Discussion</h2>
-        <div class="list-group list-group-flush mb-3">
-        {% for entry in discussion_messages %}<article class="list-group-item px-0">
-            <p class="mb-1"><strong>{{ entry.sender.get_full_name|default:entry.sender.username }}</strong> <span class="text-secondary small">{{ entry.created_at|date:"M j, Y, H:i T" }} &middot; Version {{ entry.deliverable.version }} &middot; {{ entry.get_kind_display }}</span></p>
-            <p class="mb-0 text-break">{{ entry.body|linebreaksbr }}</p>
+        <div class="discussion-thread mb-3">
+        {% for entry in discussion_messages %}<article class="discussion-message {% if entry.sender_id == campaign.client_id %}discussion-message-client{% else %}discussion-message-employee{% endif %}">
+            <header class="discussion-message-header">
+                <div class="discussion-message-sender">
+                    <strong>{{ entry.sender.get_full_name|default:entry.sender.username }}</strong>
+                    <span class="discussion-message-role">{% if entry.sender_id == campaign.client_id %}Client{% else %}Marketing Employee{% endif %}</span>
+                </div>
+                {% if entry.kind == 'changes_requested' %}<span class="discussion-revision-badge">{{ entry.get_kind_display }}</span>{% endif %}
+            </header>
+            <p class="discussion-message-body">{{ entry.body|linebreaksbr }}</p>
+            <footer class="discussion-message-meta">
+                <time datetime="{{ entry.created_at|localtime|date:'c' }}">{{ entry.created_at|localtime|date:"M j, Y, H:i T" }}</time>
+                <span>Version {{ entry.deliverable.version }}</span>
+                {% if entry.kind != 'changes_requested' %}<span>{{ entry.get_kind_display }}</span>{% endif %}
+            </footer>
         </article>{% empty %}<p class="text-secondary">No messages yet.</p>{% endfor %}
         </div>
         {% if can_message %}<form method="post">{% csrf_token %}
@@ -46,6 +61,6 @@
             {% for error in message_form.body.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
             <button class="btn btn-primary mt-3" type="submit">Send Message</button>
         </form>{% endif %}
-    </div></div>
+    </div></div></div>
 </div></div></div></main>
 {% endblock %}

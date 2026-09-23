@@ -34,6 +34,7 @@
             {% for deliverable in deliverables %}
                 <div class="list-group-item px-0 py-3"><div class="d-flex flex-wrap justify-content-between gap-3">
                     <div><h3 class="h6 fw-bold mb-1">{{ deliverable.title }}</h3><p class="text-secondary mb-2">{{ deliverable.description|default:"No description" }}</p><small>Uploaded {{ deliverable.uploaded_at|date:"M j, Y, P" }} by {{ deliverable.uploaded_by }}</small></div>
+                    {% include 'campaigns/includes/deliverable_video.html' with deliverable=deliverable only %}
                     <div class="text-end"><p class="small text-secondary mb-1">Version {{ deliverable.version }} &middot; {% if deliverable.is_current %}Current{% else %}Historical{% endif %}</p><a class="btn btn-sm btn-outline-secondary mt-2" href="{% url 'deliverable_discussion' deliverable.campaign_id deliverable.id %}">Discussion / Versions</a>
                         {% include 'campaigns/includes/status_badge.html' with status=deliverable.approval_status label=deliverable.get_approval_status_display extra_classes="align-self-start" only %}<br>
                         {% if deliverable.uploaded_file %}<a class="btn btn-sm btn-outline-primary mt-2" href="{{ deliverable.uploaded_file.url }}" target="_blank" rel="noopener noreferrer">Open file</a>{% else %}<span class="text-secondary">No file available</span>{% endif %}

@@ -1,0 +1,9 @@
+{% if deliverable.video_content_type %}
+<div class="mt-2">
+    <video controls preload="metadata" playsinline width="320" class="mw-100 rounded" aria-label="Video preview: {{ deliverable.title }}">
+        <source src="{{ deliverable.uploaded_file.url }}" type="{{ deliverable.video_content_type }}">
+        Your browser does not support this video. Use the download link below.
+    </video>
+    <a class="d-block small" href="{{ deliverable.uploaded_file.url }}?download=1">Download video</a>
+</div>
+{% endif %}

@@ -1,6 +1,9 @@
+from datetime import timedelta
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client
 from django.urls import reverse
+from django.utils import timezone
 
 from .forms import CampaignRequestForm, DeliverableUploadForm
 from .models import Campaign, Deliverable
@@ -23,7 +26,8 @@ class CampaignRequirementsTests(AuditFixtures):
         return {
             "name": "Product Launch", "description": "Promote the new product.",
             "campaign_type": "Social Media", "target_audience": "Local shoppers",
-            "budget": "5000.00", "start_date": "2026-10-01", "end_date": "2026-10-31",
+            "budget": "5000.00", "start_date": timezone.localdate().isoformat(),
+            "end_date": (timezone.localdate() + timedelta(days=30)).isoformat(),
             "platforms": self.platforms, "campaign_goal": self.campaign_goal, **overrides,
         }
 
@@ -90,7 +94,7 @@ class CampaignRequirementsTests(AuditFixtures):
         self.client.force_login(self.owner)
         for overrides, error in (
             ({"budget": "-1"}, "Budget cannot be negative."),
-            ({"end_date": "2026-09-30"}, "End date cannot be before the start date."),
+            ({"end_date": (timezone.localdate() - timedelta(days=1)).isoformat()}, "End date must be after the start date."),
         ):
             with self.subTest(overrides=overrides):
                 response = self.client.post(reverse("campaign_request"), self.request_data(**overrides))

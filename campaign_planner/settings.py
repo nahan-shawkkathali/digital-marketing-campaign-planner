@@ -125,4 +125,7 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# File uploads above Django's existing memory threshold continue to stream to disk.
+DELIVERABLE_VIDEO_MAX_BYTES = int(os.environ.get('DELIVERABLE_VIDEO_MAX_BYTES', 100 * 1024 * 1024))
+
 MESSAGE_TAGS = {message_constants.ERROR: 'danger'}

@@ -3,7 +3,7 @@
 {% block content %}
 <main class="auth-section py-5"><div class="container py-4"><div class="row justify-content-center"><div class="col-md-8 col-lg-6 col-xl-5">
     <div class="card auth-card border-0 shadow-sm"><div class="card-body p-4 p-md-5">
-        <div class="text-center mb-4"><div class="role-icon mx-auto mb-3">C</div><h1 class="h2 fw-bold">Client login</h1><p class="text-secondary mb-0">Welcome back to your campaign workspace.</p></div>
+        <div class="text-center mb-4"><div class="role-icon mx-auto mb-3"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M3 12h12M10 7l5 5-5 5" /></svg></div><h1 class="h2 fw-bold">Client login</h1><p class="text-secondary mb-0">Welcome back to your campaign workspace.</p></div>
         <form method="post" novalidate>{% csrf_token %}
             {% if form.non_field_errors %}<div class="alert alert-danger">Please enter a correct username and password.</div>{% endif %}
             {% for field in form %}<div class="mb-3"><label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}</div>{% endfor %}

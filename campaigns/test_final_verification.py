@@ -1,9 +1,11 @@
+from datetime import timedelta
 from html.parser import HTMLParser
 from urllib.parse import urlsplit
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client
 from django.urls import resolve, reverse
+from django.utils import timezone
 
 from .forms import EmployeeCampaignProgressForm
 from .models import Campaign, Deliverable, Task
@@ -187,7 +189,7 @@ class FinalRegressionTests(AuditFixtures):
         self.client.force_login(self.owner)
         for data, message in (
             ({"budget": "-1"}, "Budget cannot be negative."),
-            ({"start_date": "2026-10-02", "end_date": "2026-10-01"}, "End date cannot be before the start date."),
+            ({"start_date": timezone.localdate().isoformat(), "end_date": (timezone.localdate() - timedelta(days=1)).isoformat()}, "End date must be after the start date."),
             ({"start_date": "invalid"}, "Enter a valid date."),
         ):
             with self.subTest(data=data):

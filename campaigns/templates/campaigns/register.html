@@ -3,7 +3,7 @@
 {% block content %}
 <main class="auth-section py-5"><div class="container py-4"><div class="row justify-content-center"><div class="col-md-8 col-lg-6 col-xl-5">
     <div class="card auth-card border-0 shadow-sm"><div class="card-body p-4 p-md-5">
-        <div class="text-center mb-4"><div class="role-icon mx-auto mb-3">C</div><h1 class="h2 fw-bold">Create client account</h1><p class="text-secondary mb-0">Start planning and tracking your campaigns.</p></div>
+        <div class="text-center mb-4"><div class="role-icon mx-auto mb-3"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="4" /><path d="M2 21v-2a7 7 0 0 1 14 0v2M20 8v6M17 11h6" /></svg></div><h1 class="h2 fw-bold">Create client account</h1><p class="text-secondary mb-0">Start planning and tracking your campaigns.</p></div>
         <form method="post" novalidate>{% csrf_token %}
             {% for field in form %}<div class="mb-3"><label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}{% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}</div>{% endfor %}
             {% for error in form.non_field_errors %}<div class="alert alert-danger py-2">{{ error }}</div>{% endfor %}

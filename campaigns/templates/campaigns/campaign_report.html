@@ -124,7 +124,7 @@
                         <td>{{ deliverable.uploaded_by }}</td>
                         <td>{{ deliverable.uploaded_at|date:"M j, Y, H:i T" }}</td>
                         <td>{% include 'campaigns/includes/status_badge.html' with status=deliverable.approval_status label=deliverable.get_approval_status_display extra_classes="align-self-start" only %}</td>
-                        <td>{% if deliverable.uploaded_file %}<a href="{{ deliverable.uploaded_file.url }}" target="_blank" rel="noopener noreferrer">Open file<span class="visually-hidden">: {{ deliverable.title }} (opens in a new tab)</span></a>{% else %}<span class="text-secondary">No file available</span>{% endif %}</td>
+                        <td>{% if deliverable.uploaded_file %}<a href="{{ deliverable.uploaded_file.url }}" target="_blank" rel="noopener noreferrer">Open file<span class="visually-hidden">: {{ deliverable.title }} (opens in a new tab)</span></a>{% if deliverable.video_content_type %} <a href="{{ deliverable.uploaded_file.url }}?download=1">Download video</a>{% endif %}{% else %}<span class="text-secondary">No file available</span>{% endif %}</td>
                     </tr>
                 {% empty %}<tr><td colspan="5" class="text-secondary text-center py-4">No deliverables have been uploaded for this campaign.</td></tr>{% endfor %}
             </tbody>
